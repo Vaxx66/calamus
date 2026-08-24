@@ -1,0 +1,12 @@
+M=(0, 1) S=('1', '2') |T|=4 T=['1', '5/4', '2', '9/4']
+  O_full: {'dimC0': 12, 'dimC1': 44, 'dimC2': 156, 'rank_d0': 10, 'rank_d1': 34, 'dimZ1': 10, 'dimH1_reduced': 0, 'pairs': 22}  => dim H^1 (all t) = 0
+  O_arr : {'dimC0': 12, 'dimC1': 4, 'dimC2': 0, 'rank_d0': 4, 'rank_d1': 0, 'dimZ1': 4, 'dimH1_reduced': 0, 'pairs': 0}  => dim H^1 (all t) = 0  dim C^1(all t) = 16
+M=(0, 1, 2) S=('1', '2') |T|=5 T=['1', '5/4', '2', '9/4', '3']
+  O_full: {'dimC0': 24, 'dimC1': 96, 'dimC2': 336, 'rank_d0': 22, 'rank_d1': 72, 'dimZ1': 24, 'dimH1_reduced': 2, 'pairs': 22}  => dim H^1 (all t) = 10
+  O_arr : {'dimC0': 24, 'dimC1': 6, 'dimC2': 0, 'rank_d0': 6, 'rank_d1': 0, 'dimZ1': 6, 'dimH1_reduced': 0, 'pairs': 0}  => dim H^1 (all t) = 0  dim C^1(all t) = 30
+M=(0, 1) S=('1', '5/4') |T|=3 T=['1', '5/4', '3/2']
+  O_full: {'dimC0': 12, 'dimC1': 44, 'dimC2': 156, 'rank_d0': 10, 'rank_d1': 34, 'dimZ1': 10, 'dimH1_reduced': 0, 'pairs': 22}  => dim H^1 (all t) = 0
+  O_arr : {'dimC0': 12, 'dimC1': 4, 'dimC2': 0, 'rank_d0': 4, 'rank_d1': 0, 'dimZ1': 4, 'dimH1_reduced': 0, 'pairs': 0}  => dim H^1 (all t) = 0  dim C^1(all t) = 12
+M=(0, 1, 2, 3) S=('1', '2') |T|=7 T=['1', '5/4', '2', '9/4', '3', '13/4', '17/4']
+  O_full: {'dimC0': 40, 'dimC1': 168, 'dimC2': 584, 'rank_d0': 38, 'rank_d1': 124, 'dimZ1': 44, 'dimH1_reduced': 6, 'pairs': 22}  => dim H^1 (all t) = 42
+  O_arr : {'dimC0': 40, 'dimC1': 8, 'dimC2': 0, 'rank_d0': 8, 'rank_d1': 0, 'dimZ1': 8, 'dimH1_reduced': 0, 'pairs': 0}  => dim H^1 (all t) = 0  dim C^1(all t) = 56

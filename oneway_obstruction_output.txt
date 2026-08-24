@@ -1,0 +1,108 @@
+==============================================================================
+RUN: Example 6.6 (arrow category, merge morphism only)
+  category = arrow,  M = [0, 1],  S = [1, 2]
+  |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 2, 9/4]
+  defect cochain c: nonzero exactly on -- (natural!)
+  Lemma 6.3 cocycle identity: verified on all composable pairs
+  dim C^1 = 16, dim Z^1 = 16, dim B^1 = 16, dim H^1(BW; Hom(B,A)) = 0
+  [c] = 0 in unrestricted H^1?  True
+==============================================================================
+RUN: full design category, separated scales S={1,2}
+  category = full,  M = [0, 1],  S = [1, 2]
+  |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 2, 9/4]
+  defect cochain c: nonzero exactly on ['c1', 'c2', 'i1', 'i2']
+  Lemma 6.3 cocycle identity: verified on all composable pairs
+  dim C^1 = 176, dim Z^1 = 40, dim B^1 = 40, dim H^1(BW; Hom(B,A)) = 0
+  [c] = 0 in unrestricted H^1?  True
+  particular correcting 0-cochain h found (params -> 0). Corrected g*+h rows are 0/1 stochastic (deterministic): True
+  corrected quantity at w2 (theta -> value):
+      ((0, 0), 1) -> 1
+      ((0, 0), 2) -> 2
+      ((0, 1), 1) -> 1
+      ((0, 1), 2) -> 2
+      ((1, 0), 1) -> 1
+      ((1, 0), 2) -> 2
+      ((1, 1), 1) -> 1
+      ((1, 1), 2) -> 2
+  recalibration class (corrected = r_w o g_w, r_w : T -> T):
+    forced identification classes on T: [['1', '5/4'], ['2', '9/4']]
+    information-bearing (non-constant) recalibration exists: True
+    bijective recalibration exists: False
+==============================================================================
+RUN: full design category, overlapping scales S={1, 5/4} (scale confounding)
+  category = full,  M = [0, 1],  S = [1, 5/4]
+  |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 3/2]
+  defect cochain c: nonzero exactly on ['c1', 'c2', 'i1', 'i2']
+  Lemma 6.3 cocycle identity: verified on all composable pairs
+  dim C^1 = 132, dim Z^1 = 30, dim B^1 = 30, dim H^1(BW; Hom(B,A)) = 0
+  [c] = 0 in unrestricted H^1?  True
+  particular correcting 0-cochain h found (params -> 0). Corrected g*+h rows are 0/1 stochastic (deterministic): True
+  corrected quantity at w2 (theta -> value):
+      ((0, 0), 1) -> 1
+      ((0, 0), 5/4) -> 5/4
+      ((0, 1), 1) -> 1
+      ((0, 1), 5/4) -> 5/4
+      ((1, 0), 1) -> 1
+      ((1, 0), 5/4) -> 5/4
+      ((1, 1), 1) -> 1
+      ((1, 1), 5/4) -> 5/4
+  recalibration class (corrected = r_w o g_w, r_w : T -> T):
+    forced identification classes on T: [['1', '5/4', '3/2']]
+    information-bearing (non-constant) recalibration exists: False
+    bijective recalibration exists: False
+    ==> obstruction NONZERO relative to the admissible class:
+        every natural recalibration of the marginal dispersion is
+        constant, i.e. destroys all information (scale confounding).
+==============================================================================
+RUN: CHECK A: arrow category, quantity with nonzero defect on p
+  category = arrow,  M = [0, 1],  S = [1, 2]
+  |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 2, 9/4]
+  defect cochain c: nonzero exactly on ['p']
+  Lemma 6.3 cocycle identity: verified on all composable pairs
+  dim C^1 = 16, dim Z^1 = 16, dim B^1 = 16, dim H^1(BW; Hom(B,A)) = 0
+  [c] = 0 in unrestricted H^1?  True
+  particular correcting 0-cochain h found (params -> 0). Corrected g*+h rows are 0/1 stochastic (deterministic): True
+  corrected quantity at w2 (theta -> value):
+      ((0, 0), 1) -> 1
+      ((0, 0), 2) -> 2
+      ((0, 1), 1) -> 1
+      ((0, 1), 2) -> 2
+      ((1, 0), 1) -> 5/4
+      ((1, 0), 2) -> 9/4
+      ((1, 1), 1) -> 5/4
+      ((1, 1), 2) -> 9/4
+==============================================================================
+RUN: CHECK B: full category, M={0,1,2}, S={1,2}
+  category = full,  M = [0, 1, 2],  S = [1, 2]
+  |Theta(w1)| = 6, |Theta(w2)| = 18, T = [1, 5/4, 2, 9/4, 3]
+  defect cochain c: nonzero exactly on ['c1', 'c2', 'i1', 'i2']
+  Lemma 6.3 cocycle identity: verified on all composable pairs
+  dim C^1 = 480, dim Z^1 = 120, dim B^1 = 110, dim H^1(BW; Hom(B,A)) = 10
+  [c] = 0 in unrestricted H^1?  True
+  particular correcting 0-cochain h found (params -> 0). Corrected g*+h rows are 0/1 stochastic (deterministic): True
+  corrected quantity at w2 (theta -> value):
+      ((0, 0), 1) -> 1
+      ((0, 0), 2) -> 2
+      ((0, 1), 1) -> 1
+      ((0, 1), 2) -> 2
+      ((0, 2), 1) -> 1
+      ((0, 2), 2) -> 2
+      ((1, 0), 1) -> 1
+      ((1, 0), 2) -> 2
+      ((1, 1), 1) -> 1
+      ((1, 1), 2) -> 2
+      ((1, 2), 1) -> 1
+      ((1, 2), 2) -> 2
+      ((2, 0), 1) -> 1
+      ((2, 0), 2) -> 2
+      ((2, 1), 1) -> 1
+      ((2, 1), 2) -> 2
+      ((2, 2), 1) -> 1
+      ((2, 2), 2) -> 2
+  recalibration class (corrected = r_w o g_w, r_w : T -> T):
+    forced identification classes on T: [['1', '5/4', '2', '9/4', '3']]
+    information-bearing (non-constant) recalibration exists: False
+    bijective recalibration exists: False
+    ==> obstruction NONZERO relative to the admissible class:
+        every natural recalibration of the marginal dispersion is
+        constant, i.e. destroys all information (scale confounding).
