@@ -1,0 +1,3109 @@
+\pdfoutput=1
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage{txfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{cd}
+\usetikzlibrary{decorations.pathmorphing}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{task}{Problem}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{caveat}[theorem]{Remark}
+\newtheorem*{remarkun}{Remark}
+
+\newcommand{\cat}[1]{\mathsf{#1}}
+\newcommand{\catU}{\cat{U}}
+\newcommand{\catV}{\cat{V}}
+\newcommand{\catO}{\cat{\Omega}}
+\newcommand{\catS}{\cat{S}}
+\newcommand{\catD}{\cat{D}}
+\newcommand{\catK}{\cat{K}}
+\newcommand{\Meas}{\cat{Meas}}
+\newcommand{\Set}{\cat{Set}}
+\newcommand{\Stoch}{\cat{Stoch}}
+\newcommand{\FinStoch}{\cat{FinStoch}}
+\newcommand{\FinSet}{\cat{FinSet}}
+\newcommand{\Alg}{\cat{Alg}}
+\newcommand{\G}{\mathcal{G}}
+\newcommand{\Prb}{\mathcal{P}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\pr}{\mathrm{pr}}
+\newcommand{\del}{\delta}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Vect}{\cat{Vect}}
+\newcommand{\Norm}{\mathcal{N}}
+\newcommand{\Bern}{\mathrm{Bern}}
+\newcommand{\expit}{\mathrm{expit}}
+\newcommand{\res}{\mathrm{res}}
+\DeclareMathOperator{\ob}{ob}
+\DeclareMathOperator{\Nat}{Nat}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\HH}{HH}
+\newcommand{\Cat}{\cat{Cat}}
+\newcommand{\StatMod}{\cat{StatMod}}
+\newcommand{\Statk}{\StatMod_{\Meas}}
+\newcommand{\Jc}{\Delta}            % comparison functor StatMod -> Arrdet(Stoch)
+\newcommand{\Jcm}{\Delta_{\Meas}}
+\newcommand{\Arrdet}[1]{#1^{\rightarrow}_{\det}}
+\newcommand{\Arrcop}[1]{#1^{\rightarrow}_{\det,\,\mathrm{cop}}}
+\newcommand{\Arrim}[1]{#1^{\rightarrow}_{\del}}
+\newcommand{\fnote}[1]{\textcolor{blue}{FV: #1}}
+
+\title{Statistical models as natural transformations:\\
+a bridge from the McCullagh--Br\o ns hexagon to Markov categories}
+\author{Francesco Vaccarino\\
+\small Dipartimento di Scienze Matematiche ``G.\ L.\ Lagrange'', Politecnico di Torino}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+McCullagh's 2002 categorical definition of a statistical model, sharpened by
+Br\o ns into a hexagonal diagram of categories and functors, identified
+naturality as the mathematical content of the informal requirement that the
+meaning of a parameter be ``retained'' across experimental designs. 
+The programme
+supplied a language but not a calculus: no ambient categorical probability
+theory existed in which the naturality condition could be computed with,
+composed, or mechanically verified. We show that the Markov-categorical
+framework of Fritz, Cho--Jacobs and Perrone supplies exactly this calculus. Our
+main result recasts a McCullagh--Br\o ns model as a natural family of morphisms
+in the Kleisli category of the Giry monad, deterministic on the parameter side;
+under this translation McCullagh's criterion for a meaningful subparameter
+becomes a naturality condition, hence a type-level property under the functorial
+encoding, and Tjur's weaker elementary criterion, invariance under design
+reduction, is recovered as naturality restricted to the insertion morphisms.
+We prove the statement in full for finite (discrete) models, state the
+measurable case with its precise additional hypotheses, and formulate the
+coherence problem for finite designs in the cohomology of a diagram of algebras
+in the sense of Gerstenhaber--Schack and Baues--Wirsching, connecting it to
+recent work of Caputi and the author. We show that the obstruction so obtained
+is necessarily \emph{class-relative}, the unrestricted class vanishes for
+every quantity, by construction, and discharge the resulting statement by an
+exact computation for the one-way layout, which certifies the non-meaningfulness of
+the marginal dispersion relative to the class of information-bearing
+recalibrations for scale-confounded designs, recovers the within-group
+dispersion as a correction by pure linear algebra, and
+exhibits $H^{1}$ of the design scheme as a computable invariant of independent
+interest.
+\end{abstract}
+
+\medskip
+\noindent\emph{MSC 2020:} 62A01 (primary); 18M05, 60A05, 18G90 (secondary).\\
+\emph{Keywords:} statistical model; Markov category; Giry monad; natural
+transformation; meaningfulness; design category; Baues--Wirsching cohomology.
+
+
+\tableofcontents
+
+\section{Introduction}
+
+A recurring observation is that a small canon of unifying principles holds statistics together:
+likelihood, sufficiency, conditioning, ancillarity, invariance,
+exchangeability. Each principle is made precise inside its own apparatus
+(measure-theoretic probability, decision theory, group actions), and their
+mutual coherence is maintained by the trained intuition of the field rather
+than by a single calculus in which they are theorems. The best-known sustained
+attempt at such a calculus is Birnbaum's~\cite{birnbaum_foundations_1962}, which
+formulates sufficiency and conditionality as axioms on evidential meaning and
+argues that together they force the likelihood principle. That its status
+remains disputed sixty years on, over what the conditionality principle
+\emph{says}, rather than over any computation~\cite{mayo_birnbaum_2014,
+evans_birnbaum_2013}, is itself evidence that the principles have lacked an
+ambient formalism in which such a question is settled. McCullagh's ``What is a
+statistical model?''~\cite{mccullagh_what_2002} diagnosed one root of this state of
+affairs: the standard definition of a statistical model, a parametrised family
+of probability measures on a fixed sample space, is silent about how the family
+must transform when the experimental design changes, and therefore cannot even
+\emph{state}, let alone enforce, the requirement that a parameter retain
+its meaning across designs. His remedy was categorical: designs form a
+category, sample spaces and parameter spaces become functors on it, and a model
+is a natural transformation. Br\o ns, in his discussion of the
+paper~\cite[pp.~1280--1282]{brons_discussion_2002}, organised these data into a
+hexagonal diagram of categories and connecting functors, and observed that the resulting notion of
+model is equivalent, by a general comma-category argument, to a diagram in a
+fixed ``category of statistical models''. In the same passage he records that
+this category is too small for the purpose, to include all statistical
+transformations, he writes, ``Markov kernels must be allowed'', and then
+sets the point aside~\cite[p.~1282]{brons_discussion_2002}. The present paper
+takes it up. Tjur, in the same discussion
+volume~\cite{tjur_discussion_2002}, isolated the operative consequence, and did so
+\emph{without} categorical language, which he judged convenient rather than
+necessary: fixing an infinite population of covariate--response pairs, he called
+a rule assigning a parameter, a function of the unknown distribution,
+to each finite sample of covariate values, repetitions allowed, a
+\emph{parameter function}, and such a function \emph{meaningful} when it is
+invariant under the formation of marginal models, when the design is
+reduced by removing some of the sampled $x$'s, the parameter of the marginal
+distribution must agree with the parameter for the bigger sample. The
+removals are of sample points, not of points of a covariate space: before
+the criterion is imposed, his parameter functions include the sample size
+$n$ itself.
+His non-example is the design-averaged expectation $\alpha + \beta\bar x$,
+with $\bar x$ the average over the sample one happened to draw; he attributes the
+analogous failure for the correlation coefficient to McCullagh. The
+categorical form of this criterion, naturality, is McCullagh's
+own~\cite[\S4.5]{mccullagh_what_2002}, his rejoinder reads Tjur's remarks as
+explaining what is meant by a natural parameter in
+regression~\cite[p.~1304]{mccullagh_what_2002}: a \emph{natural subparameter} is a natural
+transformation of functors on the design category, and inference is meaningful
+only for natural parameters. The two formulations are stated over different
+morphism classes, Tjur's over design reduction alone, McCullagh's over the
+full design category, and neither source asserts that they coincide as
+mathematical requirements.
+
+The programme is widely admired and rarely used. We contend that the reason is
+structural rather than sociological: in 2002 the codomain of the construction
+was bare $\Set$, so naturality could be written down, but nothing could be
+\emph{done} with it, there was no ambient categorical probability theory in
+which conditioning, sufficiency, or almost-sure reasoning were native
+operations and no technology for mechanically verifying naturality. Both
+missing ingredients have since appeared, independently and for unrelated
+reasons. Markov categories~\cite{fritz_synthetic_2020,cho_disintegration_2019,perrone_markov_2024,
+fritz_definetti_2021} turn Markov kernels into the morphisms of a symmetric
+monoidal category with enough structure to state and prove, synthetically, the
+Fisher--Neyman factorisation, versions of sufficiency and ancillarity, and
+de~Finetti-type theorems.
+
+This paper does the obvious-in-retrospect thing: it moves the codomain of the
+McCullagh--Br\o ns construction from $\Set$ to the Markov category $\Stoch$
+(finite case: $\FinStoch$) and records what becomes true, what becomes
+provable, and what becomes computable. The contributions are deliberately
+modest in scope and precise in status:
+
+
+\begin{enumerate}
+\item Section~\ref{sec:mcb} gives a self-contained account of the
+McCullagh--Br\o ns framework, including a complete statement and proof of the
+comma-category equivalence (Proposition~\ref{prop:brons}), which in the
+original discussion is asserted with a sketch.
+\item Section~\ref{sec:markov} recalls the Markov-categorical background
+actually used.
+\item Section~\ref{sec:bridge} states and proves the bridge in the finite case
+(Theorem~\ref{thm:bridge-finite}), states the measurable case with its exact
+additional hypotheses (Theorem~\ref{thm:bridge-meas}), and is explicit about
+the fact that those hypotheses are a genuine restriction relative to
+McCullagh's $\Set$-valued formulation (Remark~\ref{rem:hypotheses}). It also
+records, opening \S\ref{sec:Bref}, that the bridge is, in disguise, a representability-plus-copower
+computation (Remark~\ref{rem:repr}), and uses this to
+reformulate what we call the \emph{arrow-category identification}: the open
+question whether Br\o ns' category of statistical models is equivalent to a
+category built canonically from $\Stoch$. The answer is that, on the objects
+whose parameter set and sample space satisfy two explicit regularity
+hypotheses (automatic in the finite case), it is equivalent to the arrows of
+$\Stoch$ \emph{with copower domain} (Proposition~\ref{wprop:copower}); for the
+measurable comma category the same holds without the copower restriction
+(Remark~\ref{cav:Bscope}); the passage
+between the two is an adjunction exhibiting Br\o ns' category as a coreflective
+subcategory of its measurable analogue, so that the copower restriction is the
+non-invertibility of a counit and nothing more
+(Proposition~\ref{prop:coreflection} and
+Corollary~\ref{cor:coreflection-diagrams}).
+\item Section~\ref{sec:meaningful} defines Tjur meaningfulness precisely,
+proves its characterisation as a naturality condition under the bridge
+(Proposition~\ref{prop:tjur}), and reduces its verification over finite
+designs to finitely many matrix equalities (Corollary~\ref{cor:decidable}).
+\item Section~\ref{sec:hochschild} formulates the coherence problem for finite
+designs cohomologically: a candidate design-indexed quantity is correctable,
+within a prescribed admissible class, to a natural (hence meaningful) one iff an
+explicit obstruction cochain in the cohomology of a diagram of algebras \`a la
+Gerstenhaber--Schack~\cite{gerstenhaber_schack_1983}/Baues--Wirsching~\cite{baues_cohomology_1985}
+is the coboundary of a correction in that class.
+The equivalence is proved (Proposition~\ref{wprop:obstruction}),
+together with the observation that forces the obstruction to be read relative to
+an admissible correction class. The one-way layout is then carried out in full
+(Examples~\ref{ex:oneway}--\ref{ex:oneway-h1}).
+\item Section~\ref{sec:nonclaims} delimits the scope. Several statements
+adjacent to the results below (paradigm unification, nonparametric limits)
+are formulable in this framework but are not proved here; the boundary is
+drawn explicitly rather than left blurred.
+\end{enumerate}
+
+\paragraph{Related work.}
+The closest prior work is Patterson's thesis~\cite{patterson_algebra_2020}, which
+develops an algebraic theory of statistical models with machine representation
+in view; the present paper differs in taking the design-indexed
+(McCullagh--Br\o ns) structure, rather than the model-theoretic signature, as
+primitive and specifically targeting the naturality/meaningfulness axis.
+Fritz~\cite{fritz_synthetic_2020} proves synthetic sufficiency theorems for a single
+fixed sample space, \emph{inside} the hom-sets of one Markov
+category~\cite[Def.~14.1]{fritz_synthetic_2020}; McCullagh--Br\o ns naturality is a
+condition \emph{across} a diagram of such hom-sets; the two are complementary,
+and their combination (fibred over the design category) is exactly the
+structure studied here. Jacobs' channel-based
+probability~\cite{jacobs_structured_2021}, the synthetic de Finetti
+theorem~\cite{fritz_definetti_2021}, the representable-category comparison of
+statistical experiments~\cite{fritz_representable_2023} and the dilational
+axiomatics of~\cite{fritz_dilations_2023} supply techniques we expect to
+import in later work. Categories of Markov kernels have also been put to work
+well outside inference proper: Sergeant-Perthuis develops rigorous statistical
+mechanics compositionally, with statistical systems presented as
+representations of posets and their Gibbs phases as invariants of those
+representations, in a setting that couples measurable maps with Markov
+kernels~\cite{sergeantperthuis_categorical_2023,
+sergeantperthuis_compositional_2024}. That the same category of kernels underlies
+both that setting and the design-indexed one studied here is evidence of its
+generality:
+the two settings are unrelated here, and no correspondence is claimed.
+Helland's work on
+statistical symmetry~\cite{helland_steps_2010} pursues the invariance principle by
+group-theoretic rather than categorical means; the compositional approach to
+learning of~\cite{fong_backprop_2019} is adjacent to, but distinct from, the
+design-indexed structure studied here.
+
+Two further observations in Br\o ns' discussion bear on the shape of what
+follows, and we record them here because they are easily mistaken for
+departures from the 2002 framework when they are in fact requests made within
+it. First, having recognised a model as a diagram in his category of
+statistical models over the basic category, he remarks that no evident reason
+confines the theory to base categories of that particular form, and proposes
+admitting diagrams over arbitrary categories, which would in particular
+subsume the passage to subcategories~\cite[p.~1282]{brons_discussion_2002}.
+Extending the indexing beyond the comma-category shape of
+Definition~\ref{def:designdata} is therefore continuation rather than
+importation. Second, he observes that the product and repetition
+constructions of~\cite{mccullagh_what_2002} are best treated with monoidal
+categories, monoidal functors and monoidal natural transformations, noting
+that $\Prb$ carries a monoidal structure given by the product of
+measures~\cite[pp.~1282--1283]{brons_discussion_2002}. The codomain adopted
+here is monoidal in exactly that sense; the copy--discard structure recalled
+in \S\ref{sec:markov} is a strengthening of it, and is what makes conditioning
+and independence expressible rather than merely the product of models.
+
+\section{The McCullagh--Br\o ns framework}\label{sec:mcb}
+
+We fix the notation of Br\o ns' discussion~\cite{brons_discussion_2002}, in the form used
+throughout the sequel. All categories in this section are ordinary (locally
+small) categories.
+
+\begin{definition}[Design data]\label{def:designdata}
+The framework is parametrised by:
+\begin{enumerate}
+\item a category $\catU$ of \emph{statistical units} (typical objects: finite
+sets of experimental units; typical morphisms: injections, or restriction to
+subsamples);
+\item a category $\catO$ of \emph{covariate spaces};
+\item a category $\catV$ of \emph{response scales} (typical morphisms:
+measurable surjections implementing coarsening of the response, affine
+rescalings, etc.);
+\item the category $\catS \coloneqq \catV \times \catU^{\op}$ of \emph{sample
+space indices}, together with a functor $\Gamma \colon \catS \to \Meas$ sending
+$(v,u)$ to the measurable space of $v$-valued responses on the units $u$
+(canonically $\Gamma(v,u) = v^{u}$ with product structure when $v$ is a measurable
+space and $u$ a finite set);
+\item the category of \emph{designs}
+\[
+\catD \;\coloneqq\; (J_{\catU} \downarrow J_{\catO}),
+\]
+the comma category of a pair of functors $J_{\catU}\colon \catU \to \cat{C}$,
+$J_{\catO} \colon \catO \to \cat{C}$ into a common ambient category (in the
+basic examples $\cat{C} = \Set$ and both $J$'s are the underlying-set
+functors). An object of $\catD$ is thus a triple $(u, \omega, x)$ with
+$x \colon J_\catU u \to J_\catO \omega$ a \emph{design map} assigning
+covariate values to units; a morphism
+$(u,\omega,x) \to (u',\omega',x')$ is a pair of morphisms
+$\varphi \colon u \to u'$ in $\catU$, $\psi \colon \omega \to \omega'$ in
+$\catO$ with $x' \circ J\varphi = J\psi \circ x$. We write
+$\pr_{\catU} \colon \catD \to \catU$ and
+$\pr_{\catO} \colon \catD \to \catO$ for the projections;
+\item a concrete category $\catK$ of \emph{parameter objects}, with faithful
+functor $U_{\catK} \colon \catK \to \Set$, and a contravariant \emph{parameter
+functor} $\Theta \colon \catO^{\op} \to \catK$.
+\end{enumerate}
+\end{definition}
+
+\begin{remark}
+Contravariance of $\Theta$ encodes the statistical fact that enlarging the
+covariate space enlarges (or reparametrises) the parameter, while a morphism
+of covariate spaces induces a map of parameters in the opposite direction; the
+regression examples of~\cite[\S6]{mccullagh_what_2002} are of this shape.
+Contravariance of the $\catU$ factor in $\catS$ encodes that restricting to a
+subsample induces a (projection) map of sample spaces in the opposite
+direction.
+\end{remark}
+
+Let $\Prb \colon \Meas \to \Set$ denote the functor sending a measurable space
+to its set of probability measures and a measurable map to the pushforward.
+(This is the underlying-set composite of the Giry monad
+$\G \colon \Meas \to \Meas$~\cite{giry_categorical_1982}.) Note that $\Prb$ is
+$\Set$-valued: a map $\Theta_0 \to \Prb(S)$ is a family of probability
+measures on $S$ indexed by $\Theta_0$, with no measurability imposed in the
+index. This is the gap the bridge of \S\ref{sec:bridge} has to close,
+vanishing when the parameter object is discrete, and otherwise an added
+hypothesis (Theorem~\ref{thm:bridge-meas}).
+
+\begin{definition}[McCullagh--Br\o ns model]\label{def:mcbmodel}
+With the data of Definition~\ref{def:designdata}, form the two composite
+functors $\catV \times \catD^{\op} \to \Set$:
+\[
+L \;\coloneqq\; U_{\catK} \circ \Theta \circ \pr_{\catO}^{\op}
+\circ \pr_{2}
+\qquad\text{and}\qquad
+R \;\coloneqq\; \Prb \circ \Gamma \circ \bigl(\id_{\catV} \times \pr_{\catU}^{\op}\bigr),
+\]
+where $\pr_2 \colon \catV \times \catD^{\op} \to \catD^{\op}$ is the
+projection. A \emph{statistical model} is a natural transformation
+\[
+P \colon L \Longrightarrow R.
+\]
+Concretely: for every response scale $v$ and every design $d = (u,\omega,x)$,
+a map
+\[
+P_{v,d} \colon \; U_\catK\Theta(\omega) \longrightarrow \Prb\bigl(\Gamma(v,u)\bigr),
+\qquad \theta \longmapsto P_{v,d}(\cdot \mid \theta),
+\]
+assigning to each parameter value a probability measure on the sample space,
+such that for every morphism $(\alpha,(\varphi,\psi)^{\op})$ of
+$\catV \times \catD^{\op}$ the evident square commutes.
+\end{definition}
+
+The six categories $\catU,\catV,\catO,\catS,\catD,\catK$ and the functors
+between them, with $\Meas$ and $\Set$ as ambient codomains, assemble into
+Br\o ns' hexagonal diagram; a model is a natural transformation filling the
+hexagon between its two composite paths:
+\[
+\begin{tikzcd}[column sep=1.6em, row sep=1.9em]
+& \catV \times \catD^{\op}
+\arrow[dl, "\pr_2"'] \arrow[dr, "\id_\catV \times \pr_\catU^{\op}"] & \\
+\catD^{\op} \arrow[d, "\pr_\catO^{\op}"'] & & \catS \arrow[d, "\Gamma"] \\
+\catO^{\op} \arrow[d, "\Theta"'] \arrow[rr, phantom, "\overset{P}{\Longrightarrow}" description] & & \Meas \arrow[d, "\Prb"] \\
+\catK \arrow[dr, "U_\catK"'] 
+& & \Set \arrow[dl, "id_\Set"]\\
+&\Set
+\end{tikzcd}
+\]
+
+\begin{remark}[Br\o ns' packaging and McCullagh's own definition]
+The hexagon is Br\o ns'. McCullagh's definition
+in~\cite[\S4.2]{mccullagh_what_2002} holds the response scale \emph{fixed}
+(\S4.7 of the same paper lets it vary): with the scale fixed, the parameter is a
+contravariant functor $\catO \to \catK$, and a model is a natural transformation
+of functors on $\catD$ alone. The product categories
+$\catS = \catV \times \catU^{\op}$ and
+$\catV \times \catD^{\op}$ are McCullagh's~\cite[\S4.7, p.~1240]{mccullagh_what_2002};
+Br\o ns restates them in his own notation~\cite[p.~1280]{brons_discussion_2002}
+and then packages $\Theta$ as a functor on $\catO^{\op}$ alone. Three differences are worth recording, since we use
+Br\o ns' formulation throughout.
+
+\begin{enumerate}
+\item[(i)] \emph{The $\catV$ slot is additional data.} In the hexagon $\catV$
+varies while $\Theta$ is defined on $\catO^{\op}$ alone, so a non-identity
+response-scale morphism constrains the model at a fixed parameter value. In
+McCullagh's own worked construction the parameter of a linear model is a
+subrepresentation $\Theta_{\omega} \subseteq v^{\omega}$ of the standard
+representation~\cite[p.~1235]{mccullagh_what_2002}, and therefore \emph{does}
+depend on the response scale. The two agree exactly when $v$ is held fixed,
+which is the hypothesis of McCullagh's \S\S4.2--4.6; the discrepancy is otherwise real,
+and is what Remark~\ref{cav:scaleV} measures.
+\item[(ii)] \emph{Morphism restrictions.} McCullagh takes the morphisms of
+$\catU$ and $\catO$ to be injective~\cite[\S4.1]{mccullagh_what_2002}; Br\o ns
+judges such restrictions dispensable and does not impose
+them~\cite[p.~1281]{brons_discussion_2002}. Definition~\ref{def:designdata}
+follows Br\o ns for $\catO$; for $\catU$, every example below takes
+$\FinSet_{\mathrm{inj}}$, and the verifications of \S\ref{sec:worked} do use
+the injectivity of unit maps (see the remark following~\eqref{eq:commacond}),
+so that restriction is not dispensable there. The choice for $\catO$ is not
+cosmetic: it fixes the class over which
+naturality is quantified, and hence the gap between McCullagh's meaningfulness
+criterion and Tjur's, as \S\ref{sec:meaningful} makes precise.
+\item[(iii)] \emph{Nothing below depends on the difference.} Every statement
+in the sequel is a statement about the naturality squares of
+Definition~\ref{def:mcbmodel}, and for fixed $v$ these are exactly McCullagh's
+squares of~\cite[p.~1236]{mccullagh_what_2002}. Where the $\catV$ slot does
+work of its own, we say so.
+\end{enumerate}
+\end{remark}
+
+\begin{example}[One-way layout]\label{ex:oneway-setup}
+\leavevmode
+This is the running example of the paper. We give it in the same detail as the
+instantiations of \S\ref{sec:worked}, which it precedes only because it is the
+simplest of the three; the verification of naturality is given at the end of
+\S\ref{sec:worked}, once the naturality squares have been displayed.
+
+\medskip
+\noindent\textbf{The experiment, in words.} A single \emph{factor} is applied
+to each experimental unit: every unit receives exactly one of finitely many
+mutually exclusive interventions, its \emph{treatment}. There is no blocking,
+no repeated measurement, and no explanatory variable other than the treatment
+received, this is what \emph{one-way} means. A \emph{treatment label set}
+is a finite non-empty set $\omega$ whose elements name the available
+treatments (equivalently, the \emph{levels} of the factor). Only the naming is
+retained: $\omega$ carries no order, no metric and no algebraic structure.
+That is precisely why the covariate category below consists of bare finite
+sets rather than of vector spaces as in Example~\ref{ex:linreg} below; the passage
+between the two descriptions is dummy coding, and is
+Remark~\ref{rem:dummy}.
+
+\begin{enumerate}
+\item \textbf{Units.} $\catU = \FinSet_{\mathrm{inj}}$: an object $u$ is an
+index set for the experimental units actually enrolled; a morphism
+$\varphi \colon u \hookrightarrow u'$ is the inclusion of a subsample. We
+write $n = |u|$.
+
+\item \textbf{Covariate spaces $=$ treatment label sets.} $\catO =
+\catO_{\mathrm{lab}}$, the full subcategory of $\FinSet$ on the finite
+non-empty sets: objects are treatment label sets, morphisms are \emph{all}
+maps $\psi \colon \omega \to \omega'$ of such sets. Four kinds of morphisms
+carry the statistical readings, and every $\psi$ is a surjection followed by
+an injection, so the first two generate:
+\begin{itemize}
+\item $\psi$ \emph{surjective}: \emph{merging} of treatments. The fibres
+$\psi^{-1}(b)$, $b \in \omega'$, are the blocks of treatments declared
+indistinguishable.
+\item $\psi$ \emph{injective and not bijective}: \emph{selection} of a proper
+subfamily of treatments, i.e.\ the restriction of the experiment to some of
+its groups. When $\psi$ is a proper inclusion $\omega' \subsetneq \omega$,
+the surviving labels carried unchanged, we call it an \emph{insertion}
+(design-reduction) morphism, after
+Tjur~\cite[p.~1299]{tjur_discussion_2002}: his elementary criterion
+quantifies over removals of sample points, and on the quantities of
+\S\ref{sec:meaningful} that quantification acts through precisely this
+class (Lemma~\ref{lem:tjurshadow}), a proper subclass of the morphisms over
+which McCullagh's naturality quantifies; \S\ref{sec:meaningful} keeps the
+two apart. Every injection is a bijection followed by an insertion, so
+selections in general are relabellings composed with insertions.
+\item $\psi$ \emph{bijective}: \emph{relabelling} of the treatments.
+\item $\psi$ \emph{constant}: collapse of all treatments to a single one, the
+design in which no treatment distinction is recorded.
+\end{itemize}
+Smaller choices of $\catO$ are legitimate and impose weaker naturality
+demands: $\catO_{\mathrm{merge}} \subset \catO_{\mathrm{lab}}$, the wide
+subcategory of surjections alone, and the two-object truncations
+$\catO_{\mathrm{arr}} \subset \catO_{\mathrm{full}}$ used in
+Example~\ref{ex:oneway}. Since naturality over a category restricts to
+naturality over any subcategory, the verification below covers all of them at
+once.
+
+\item \textbf{Response scales.} $\catV$ has the single object $\R$ with its
+Borel $\sigma$-algebra and only the identity morphism, so that the
+response-scale naturality condition (displayed as~\eqref{eq:NV} in
+\S\ref{sec:worked}) is vacuous. Affine equivariance of the one-way layout is true, but it is not an instance of \eqref{eq:NV}: see
+Remark~\ref{cav:scaleV}.
+
+\item \textbf{Sample spaces.} $\catS = \catV \times \catU^{\op}$ and
+$\Gamma(\R,u) = \R^{u}$ with the product $\sigma$-algebra, the space of real
+response vectors $y = (y_i)_{i \in u}$. On $\varphi^{\op} \colon u' \to u$ in
+$\catU^{\op}$, $\Gamma$ gives restriction $\res_{\varphi} \colon \R^{u'} \to
+\R^{u}$, $y \mapsto y \circ \varphi$.
+
+\item \textbf{Designs.} $\cat{C} = \Set$ and both $J$'s are the
+underlying-set functors, so an object of $\catD$ is a triple $(u,\omega,x)$
+with $x \colon u \to \omega$ the \emph{treatment assignment}: $x(i)$ is the
+treatment received by unit $i$. Equivalently, $x$ is the partition of $u$ into
+\emph{groups}
+\[
+u_a \;\coloneqq\; x^{-1}(a) \subseteq u, \qquad a \in \omega,
+\qquad n_a \coloneqq |u_a|, \qquad \textstyle\sum_{a \in \omega} n_a = n,
+\]
+indexed by $\omega$ and allowed to have empty parts. The design is
+\emph{balanced} when all $n_a$ are equal, and $x$ is surjective exactly when
+every treatment is observed. A morphism $(\varphi,\psi) \colon
+(u,\omega,x) \to (u',\omega',x')$ is a subsample inclusion together with a
+treatment map such that
+\[
+x'(\varphi(i)) \;=\; \psi(x(i)) \qquad (i \in u),
+\]
+the comma condition, displayed as~\eqref{eq:commacond} in \S\ref{sec:worked}:
+\emph{each retained unit carries, in the larger design, the $\psi$-image of
+the treatment it carried in the smaller one.}
+
+\item \textbf{Parameters.} $\catK$ has objects
+$W \times \R_{>0}$ with $W \in \Vect_{\R}^{\mathrm{fd}}$, morphisms
+$A \times \id_{\R_{>0}}$ with $A$ linear, and $U_{\catK}$ the underlying set,
+faithful (the same parameter category is used in Example~\ref{ex:linreg}
+below). The parameter functor is
+\[
+\Theta(\omega) \;=\; \R^{\omega} \times \R_{>0},
+\qquad
+\Theta(\psi)(\mu',\sigma^{2}) \;=\; (\mu' \circ \psi,\ \sigma^{2}),
+\quad\text{i.e.}\quad
+\bigl(\Theta(\psi)\mu'\bigr)_{a} = \mu'_{\psi(a)} .
+\]
+A parameter value is a pair $\theta = (\mu,\sigma^{2})$ with $\mu =
+(\mu_a)_{a \in \omega}$ the vector of \emph{group means}, one real number
+per treatment label, not per unit, and $\sigma^{2}$ a single
+\emph{common} (homoscedastic) error variance, shared by all groups and
+therefore untouched by $\Theta(\psi)$. Precomposition $\psi^{*}$ is linear, so
+$\Theta$ does land in $\catK$, and it is contravariant because a map of label
+sets pulls means back, not forward.
+\end{enumerate}
+
+\noindent\textbf{The model.} For $d = (u,\omega,x)$ and $\theta =
+(\mu,\sigma^{2}) \in \R^{\omega} \times \R_{>0}$,
+\[
+P_{\R,d}\bigl(\,\cdot \mid \mu,\sigma^{2}\bigr)
+\;=\; \bigotimes_{i \in u} \Norm(\mu_{x(i)},\,\sigma^{2})
+\qquad \text{on } \R^{u},
+\]
+that is, $Y_i = \mu_{x(i)} + \varepsilon_i$ with $\varepsilon_i$ independent
+$\Norm(0,\sigma^{2})$: the textbook Gaussian one-way layout, with group sizes
+$n_a$ read off the design and no constraint (such as $\sum_a \mu_a = 0$)
+imposed on $\mu$.
+\end{example}
+
+
+\medskip
+\noindent The example is carried through the whole paper: as a family of
+Markov kernels in Example~\ref{ex:oneway-cont}, as the test case for
+meaningfulness in \S\ref{sec:meaningful}, and, after truncating $\catO$ to two
+objects and discretising $\Theta$, as the finite Baues--Wirsching computation
+of Example~\ref{ex:oneway}.
+
+\subsection{Br\o ns' comma-category equivalence}
+
+Br\o ns' key structural observation is that the somewhat unwieldy
+Definition~\ref{def:mcbmodel} is equivalent to a diagram in a single fixed
+category of statistical models. Recall that for a functor
+$F \colon \cat{B} \to \cat{E}$, the comma category $(\id_{\cat E} \downarrow
+F)$ has objects the triples $(e, b, p)$ with $p \colon e \to F b$ in
+$\cat{E}$.
+
+\begin{definition}\label{def:statmod}
+The \emph{category of statistical models} is
+\[
+\StatMod \;\coloneqq\; \bigl(\id_{\Set} \downarrow \Prb\,\bigr)
+\]
+formed from $\Prb\colon\Meas\to\Set$: an object is a set $\Theta_0$, a
+measurable space $S$, and a map $\Theta_0 \to \Prb(S)$, i.e.\ exactly a
+classical parametrised family of probability measures; a morphism is a pair
+(reparametrisation, measurable map of sample spaces) making the square
+commute.
+\end{definition}
+
+\begin{proposition}[after Br\o ns~{\cite[pp.~1280,~1282]{brons_discussion_2002}}]\label{prop:brons}
+There is a bijection, natural in all the data, between
+\begin{enumerate}
+\item natural transformations $P \colon L \Rightarrow R$ as in
+Definition~\ref{def:mcbmodel}, and
+\item functors $\widehat{P} \colon \catV \times \catD^{\op} \to \StatMod$
+whose composites with the two projections of the comma category are the given
+functors $U_\catK \Theta \pr_\catO^{\op}\pr_2$ (to $\Set$) and
+$\Gamma(\id \times \pr_\catU^{\op})$ (to $\Meas$).
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+This is an instance of the universal property of the comma category: for
+functors $G \colon \cat{A} \to \cat{E}$, $H \colon \cat{A} \to \cat{B}$ and
+$F \colon \cat{B} \to \cat{E}$, lifts of $(G,H)$ to
+$\cat{A} \to (\id_{\cat E} \downarrow F)$ commuting with both projections
+correspond bijectively to natural transformations $G \Rightarrow F H$. Apply
+this with $\cat{A} = \catV \times \catD^{\op}$, $\cat{E}=\Set$,
+$\cat{B}=\Meas$, $G = L$, $H = \Gamma(\id\times\pr_\catU^{\op})$, $F = \Prb$: an
+object assignment $a \mapsto (G a, H a, P_a)$ is functorial precisely when
+each $P$-square commutes, which is naturality of $P$; morphism-level data of
+$\widehat P$ are forced, so the correspondence is bijective. Naturality in the
+data is a routine check.
+\end{proof}
+
+Br\o ns states the result with a sketch; the proof given above is complete.
+
+\subsection{Two worked instantiations of the design data}
+\label{sec:worked}
+
+Definition~\ref{def:designdata} asks for six items, and it is easy to lose
+sight of how ordinary the resulting objects are. We therefore instantiate it
+twice, for multiple linear regression and for binary classification, verify
+the naturality conditions of Definition~\ref{def:mcbmodel} in each case, and
+record two non-examples. Throughout, $\FinSet_{\mathrm{inj}}$ denotes finite
+sets and injections and $\Vect_{\R}^{\mathrm{fd}}$ finite-dimensional real
+vector spaces and linear maps.
+
+\begin{center}
+\small
+\begin{tabular}{@{}clll@{}}
+\toprule
+& item of Def.~\ref{def:designdata} & A: linear regression & B: binary classification \\
+\midrule
+(1) & $\catU$ & $\FinSet_{\mathrm{inj}}$ & $\FinSet_{\mathrm{inj}}$ \\
+(2) & $\catO$ & $\Vect_{\R}^{\mathrm{fd}}$ & $\Vect_{\R}^{\mathrm{fd}}$ \\
+(3) & $\catV$ & $\{\R\}$, identities only & $\{\mathbf{2},\mathbf{1}\}$, with
+$!\colon\mathbf{2}\to\mathbf{1}$ \\
+(4) & $\Gamma(v,u)$ & $\R^{u}$, Borel product & $v^{u}$, discrete \\
+(5) & $\catD$ & $(J_{\catU} \downarrow J_{\catO})$: design matrices & idem: feature matrices \\
+(6) & $\Theta(\omega)$ & $\omega^{*}\times\R_{>0}$ & $\omega^{*}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In both cases $\cat{C} = \Set$ and $J_{\catU}$, $J_{\catO}$ are the
+underlying-set functors, so an object of $\catD$ is a triple $(u,\omega,x)$
+with $x \colon u \to \omega$ a set map, that is, exactly a design or
+feature matrix with rows indexed by units, and a morphism
+$(u,\omega,x)\to(u',\omega',x')$ is a pair $(\varphi,\psi)$ with
+\begin{equation}\label{eq:commacond}
+x' \circ \varphi \;=\; \psi \circ x .
+\end{equation}
+Condition~\eqref{eq:commacond}, together with the injectivity of $\varphi$
+built into $\catU = \FinSet_{\mathrm{inj}}$ and the finiteness of $u$, is all
+that the verifications below consume (injectivity is used at the
+marginalisation step, and is necessary: for a non-injective $\varphi$
+square~\eqref{eq:ND} fails in all three models, two units with the same image
+becoming identical rather than independent). This is worth emphasising: the
+comma-category definition
+of $\catD$ is not bookkeeping; it is precisely the compatibility a model
+needs.
+
+Fix $v \in \catV$ and let
+$f = (\varphi,\psi) \colon d=(u,\omega,x) \to d'=(u',\omega',x')$ in $\catD$.
+In $\catD^{\op}$ this is an arrow $d' \to d$, and the square required by
+Definition~\ref{def:mcbmodel} is
+\begin{equation}\label{eq:ND}
+\begin{tikzcd}[column sep=5em, row sep=2.6em]
+U_{\catK}\Theta(\omega') \arrow[r,"P_{v,d'}"] \arrow[d,"\Theta(\psi)"'] &
+\Prb\bigl(\Gamma(v,u')\bigr) \arrow[d,"\Prb(\res_{\varphi})"] \\
+U_{\catK}\Theta(\omega) \arrow[r,"P_{v,d}"'] &
+\Prb\bigl(\Gamma(v,u)\bigr)
+\end{tikzcd}
+\end{equation}
+where $\res_{\varphi} \colon v^{u'} \to v^{u}$, $y \mapsto y\circ\varphi$, is
+restriction along $\varphi$. In words: \emph{marginalise the big model onto
+the subsample and one obtains the small model at the pulled-back parameter.}
+Separately, for $\alpha \colon v \to v'$ in $\catV$ at fixed $d$, since $L$
+does not depend on the $\catV$ coordinate, the square collapses to
+\begin{equation}\label{eq:NV}
+\Prb(\alpha^{u}) \circ P_{v,d} \;=\; P_{v',d}
+\qquad\text{on } U_{\catK}\Theta(\omega).
+\end{equation}
+
+\subsubsection*{A. Multiple linear regression}
+
+\begin{example}[Gaussian linear model]\label{ex:linreg}
+\leavevmode
+\begin{enumerate}
+\item \textbf{Units.} $\catU = \FinSet_{\mathrm{inj}}$; an object $u$ indexes
+a sample, a morphism $\varphi \colon u \hookrightarrow u'$ is the inclusion of
+a subsample.
+
+\item \textbf{Covariate spaces.} $\catO = \Vect_{\R}^{\mathrm{fd}}$. An object
+$\omega \cong \R^{p}$ is the space in which covariate vectors live; a morphism
+$\psi \colon \omega \to \omega'$ is the inclusion of a submodel's covariates
+into a larger set, or a linear recoding (centring, orthogonalisation, contrast
+coding).
+
+\item \textbf{Response scales.} $\catV$ has the single object $\R$ (Borel) and
+only the identity morphism; see Remark~\ref{cav:scaleV} for why the affine
+group cannot be used here without amending Definition~\ref{def:designdata}.
+
+\item \textbf{Sample spaces.} $\catS = \catV\times\catU^{\op}$ and
+$\Gamma(\R,u) = \R^{u}$ with the product $\sigma$-algebra; on
+$\varphi^{\op}\colon u' \to u$ in $\catU^{\op}$, $\Gamma$ gives restriction
+$\res_\varphi \colon \R^{u'} \to \R^{u}$.
+
+\item \textbf{Designs.} $\catD = (J_{\catU}\downarrow J_{\catO})$; an object
+$(u,\omega,x)$ is a design matrix, $x(i) \in \omega$ being the covariate
+vector of unit $i$. Choosing a basis of $\omega\cong\R^{p}$ and an enumeration
+of $u$, the map $x$ \emph{is} the $n\times p$ matrix $X$.
+
+\item \textbf{Parameters.} $\catK$ has objects $W\times\R_{>0}$ for
+$W \in \Vect_{\R}^{\mathrm{fd}}$ and morphisms $A\times\id_{\R_{>0}}$ with $A$
+linear; $U_{\catK}$ is the underlying set, faithful because a linear map is
+determined by its underlying function. The parameter functor is the dual, the
+subrepresentation of linear functionals inside McCullagh's standard
+representation~\cite[\S4.2, p.~1235]{mccullagh_what_2002},
+\[
+\Theta(\omega) \;=\; \omega^{*}\times\R_{>0},
+\qquad
+\Theta(\psi)(\beta',\sigma^{2}) \;=\; (\beta'\circ\psi,\ \sigma^{2}) .
+\]
+\end{enumerate}
+
+\noindent The model is, for $d=(u,\omega,x)$ and
+$\theta = (\beta,\sigma^{2}) \in \omega^{*}\times\R_{>0}$,
+\[
+P_{\R,d}(\,\cdot \mid \beta,\sigma^{2})
+\;=\; \bigotimes_{i\in u} \Norm(\beta(x(i)),\,\sigma^{2})
+\qquad\text{on } \R^{u},
+\]
+that is, $Y \sim \Norm_{n}(X\beta,\sigma^{2}I_{n})$ in coordinates.
+\end{example}
+
+\begin{proof}[Verification of~\eqref{eq:ND}]
+Take $f=(\varphi,\psi) \colon d \to d'$ and $\theta'=(\beta',\sigma^{2})$ on
+$\omega'$. Down-then-across, $\Theta(\psi)\theta'
+= (\beta'\circ\psi,\sigma^{2})$, so
+\[
+P_{\R,d}\bigl(\,\cdot \mid \Theta(\psi)\theta'\bigr)
+= \bigotimes_{i\in u}\Norm(\beta'(\psi(x(i))),\sigma^{2}).
+\]
+Across-then-down, $P_{\R,d'}(\,\cdot\mid\theta')
+= \bigotimes_{j\in u'}\Norm(\beta'(x'(j)),\sigma^{2})$, and pushing forward
+along $\res_{\varphi}$ is marginalisation onto the coordinates
+$\varphi(u) \subseteq u'$, which by independence gives
+$\bigotimes_{i\in u}\Norm(\beta'(x'(\varphi(i))),\sigma^{2})$. The two agree
+because $x'(\varphi(i)) = \psi(x(i))$, which is~\eqref{eq:commacond}. The
+argument uses exactly two structural facts: independence across units, so that
+marginalisation is computed coordinatewise, and the fact that the mean of unit
+$i$ depends on the design only through $x(i)$. Condition~\eqref{eq:NV} is
+vacuous because $\catV$ is discrete.
+\end{proof}
+
+\begin{remark}[Two familiar statistical statements, recovered]
+Specialising~\eqref{eq:ND}: with $\psi = \id_{\omega}$ and $\varphi$ a proper
+inclusion, the square says the model is consistent under subsampling, the
+marginal of an $n$-observation regression on a subsample is the regression on
+that subsample. With $\varphi = \id_{u}$ and
+$\psi \colon \omega \hookrightarrow \omega'$ the inclusion of a submodel's
+covariate space, it says that fitting the large model at a $\beta'$
+annihilating the extra directions agrees with fitting the submodel at
+$\beta'|_{\omega}$. Model nesting thus appears as a naturality condition
+rather than as a constraint on coefficients.
+\end{remark}
+
+\begin{remark}[Intercept]
+As stated, the model has no intercept. Two clean repairs: take $\catO$ to be
+finite-dimensional real \emph{affine} spaces with affine maps and
+$\Theta(\omega)$ the affine functionals on $\omega$ times $\R_{>0}$; or keep
+$\Vect$ and restrict $\catD$ to designs whose covariate maps land in an affine
+hyperplane $\{x_{0}=1\}$, with $\catO$ cut down to the linear maps preserving
+it. The first is the more natural and is what the regression examples
+of~\cite[\S6]{mccullagh_what_2002} effectively use.
+\end{remark}
+
+\begin{remark}[Design-conditional identifiability]\label{rem:identifiability}
+$\Theta(\psi)=\psi^{*}\times\id$ is injective iff $\psi$ is surjective, and
+$L(v,d)$ parametrises the design $d$ faithfully only relative to the image of
+$x$. The design-conditional statement, that $\beta$ is identified from $d$
+only on the span of $x(u) \subseteq \omega$, is invisible at the level of
+Definition~\ref{def:designdata}; it is~\eqref{eq:ND} restricted to the
+subcategory of designs of full column rank. This is the precise point at which
+design-conditional sufficiency and identifiability enter the framework.
+\end{remark}
+
+\begin{caveat}[Response-scale morphisms express \emph{invariance}, not
+equivariance]\label{cav:scaleV}
+Because $L = U_{\catK}\Theta\,\pr_{\catO}^{\op}\pr_{2}$ has no $\catV$
+dependence, a non-identity $\alpha \colon v \to v'$ imposes~\eqref{eq:NV},
+namely $\Prb(\alpha^{u})\circ P_{v,d} = P_{v',d}$ \emph{at the same parameter
+value}. For $\alpha(y)=ay+b$ the left-hand side is
+$\bigotimes_{i}\Norm(a\beta(x(i))+b,\ a^{2}\sigma^{2})$, which is not
+$P_{\R,d}(\cdot\mid\beta,\sigma^{2})$ unless $(a,b)=(1,0)$. The Gaussian
+linear model is therefore \emph{not} natural over
+$\catV = \mathrm{Aff}(\R)$, and taking $\catV$ discrete is the correct
+instantiation.
+
+Affine equivariance is of course a true and important property of the model,
+but it is the statement that the model is a fixed point of an \emph{action} on
+the parameter, which in the McCullagh--Br\o ns hexagon requires the parameter
+functor to be defined on $\catV^{\op}\times\catO^{\op}$ rather than on
+$\catO^{\op}$ alone. That is a mild generalisation of
+Definition~\ref{def:designdata}, not an instance of it, and, as recorded in
+the Remark following the hexagon in \S\ref{sec:mcb}, it is a return to
+McCullagh's own construction rather than a departure from it: his parameter is
+a subrepresentation of $v^{\omega}$ and so moves with the response scale,
+whereas the $\catV$-independence of $\Theta$ is an artefact of Br\o ns'
+packaging. In particular
+Example~\ref{ex:oneway-setup} takes $\catV$
+discrete for exactly this reason: the affine equivariance of the one-way
+layout is a true statement about an action on $\Theta$, and lies outside
+Definition~\ref{def:designdata} as written, whereas its equivariance under
+\emph{relabelling of treatments} is genuine naturality, because that acts
+through $\catO^{\op}$.
+\end{caveat}
+
+\subsubsection*{B. Binary classification}
+
+\begin{example}[Bernoulli model with a linear predictor]\label{ex:logreg}
+\leavevmode
+\begin{enumerate}
+\item \textbf{Units.} $\catU = \FinSet_{\mathrm{inj}}$, as above.
+
+\item \textbf{Covariate spaces.} $\catO = \Vect_{\R}^{\mathrm{fd}}$; objects
+are feature spaces, morphisms are linear feature maps.
+
+\item \textbf{Response scales.} $\catV$ has two objects,
+$\mathbf{2}=\{0,1\}$ and $\mathbf{1}=\{*\}$, and as morphisms the identities
+together with the unique map $!\colon\mathbf{2}\to\mathbf{1}$. Statistically:
+one may discard the label, not relabel it.
+
+\item \textbf{Sample spaces.} $\Gamma(v,u)=v^{u}$ with the discrete
+$\sigma$-algebra, so $\Gamma(\mathbf{2},u)=\{0,1\}^{u}$ is the label space and
+$\Gamma(\mathbf{1},u)$ a one-point space; on $\varphi^{\op}$, restriction as
+before.
+
+\item \textbf{Designs.} $\catD = (J_{\catU}\downarrow J_{\catO})$; an object
+$(u,\omega,x)$ is the feature matrix, the labels being absent. The labels are
+the random object and hence live in $\Gamma$, not in $\catD$, which is the
+categorical form of the statement that classification is a model conditional
+on the features.
+
+\item \textbf{Parameters.} $\catK = \Vect_{\R}^{\mathrm{fd}}$ with underlying
+set $U_{\catK}$, and $\Theta(\omega)=\omega^{*}$,
+$\Theta(\psi)(\beta') = \beta'\circ\psi$: the weight covector pulls back along
+feature maps.
+\end{enumerate}
+
+\noindent With $\expit(t)=(1+e^{-t})^{-1}$ the model is
+\[
+P_{\mathbf{2},d}(\,\cdot\mid\beta)
+\;=\; \bigotimes_{i\in u}\Bern\!\bigl(\expit(\beta(x(i)))\bigr)
+\quad\text{on }\{0,1\}^{u},
+\qquad
+P_{\mathbf{1},d}(\,\cdot\mid\beta) = \delta \ \text{on } \{*\}^{u}.
+\]
+\end{example}
+
+\begin{proof}[Verification]
+For~\eqref{eq:ND} at $v=\mathbf{2}$, marginalising a product of Bernoullis
+onto $\varphi(u)$ gives the first family below, and the pulled-back parameter
+gives the second,
+\[
+\bigotimes_{i\in u}\Bern\bigl(\expit(\beta'(x'(\varphi(i))))\bigr),
+\qquad
+\bigotimes_{i\in u}\Bern\bigl(\expit((\beta'\circ\psi)(x(i)))\bigr),
+\]
+and these agree by~\eqref{eq:commacond}. At $v=\mathbf{1}$ both sides are the
+unique measure on a one-point space. For~\eqref{eq:NV} with
+$!\colon\mathbf{2}\to\mathbf{1}$, the pushforward of
+$P_{\mathbf{2},d}(\cdot\mid\beta)$ along
+$!^{u}\colon\{0,1\}^{u}\to\{*\}^{u}$ is the Dirac measure, which is
+$P_{\mathbf{1},d}(\cdot\mid\beta)$ for every $\beta$.
+\end{proof}
+
+\begin{remark}[The link plays no role]\label{rem:glm}
+The verification uses only that the inverse link is applied \emph{pointwise to
+the linear predictor}: any measurable $g^{-1}\colon\R\to[0,1]$ yields a
+natural family by the same argument. Naturality in $\catD$ is thus the
+categorical content of the statement that a generalised linear model is
+determined by a link applied unit by unit, and conversely that any
+sample-level coupling of the predictions destroys it (Example~\ref{ex:softmax}).
+\end{remark}
+
+\begin{remark}[Why the label swap is excluded from $\catV$]
+The involution $\tau(y)=1-y$ on $\mathbf{2}$ satisfies
+$\Prb(\tau^{u})P_{\mathbf{2},d}(\cdot\mid\beta)
+= \bigotimes_{i}\Bern(\expit(-\beta(x(i))))
+= P_{\mathbf{2},d}(\cdot\mid -\beta)$, which is not
+$P_{\mathbf{2},d}(\cdot\mid\beta)$. By~\eqref{eq:NV}, this violates naturality.
+The correct reading is not that the model is defective, but that relabelling is
+an equivariance, the phenomenon of Remark~\ref{cav:scaleV} in its smallest
+possible instance, and hence a convenient test case for whether the
+$\catV$-dependent parameter functor is worth adopting.
+\end{remark}
+
+\subsubsection*{Non-examples}
+
+Both families below are well-defined and design-indexed; neither is a
+McCullagh--Br\o ns model, and they fail in the same slot for the same reason.
+
+\begin{example}[Empirical centring of the covariates]\label{ex:centring}
+On the data of Example~\ref{ex:linreg} set
+\[
+\widetilde{P}_{\R,d}(\,\cdot\mid\beta,\sigma^{2})
+= \bigotimes_{i\in u}\Norm(\beta(x(i)-\bar{x}_{d}),\ \sigma^{2}),
+\qquad
+\bar{x}_{d} = \frac{1}{|u|}\sum_{i\in u} x(i).
+\]
+This fails~\eqref{eq:ND} already for $\psi=\id$ and $\varphi$ a proper
+inclusion, since $\bar{x}_{d} \neq \bar{x}_{d'}$: the mean assigned to a given
+unit changes when other units are removed. The failure is in the $\catU$ slot,
+and it is the mechanism behind Tjur's design-averaged non-example
+(Example~\ref{ex:alphabetaxbar}; cf.\ Remark~\ref{rem:tjurscope}). Note that $\bar{x}$ is a perfectly good
+statistic; what is illegitimate is its appearance in the \emph{definition} of
+the family.
+\end{example}
+
+\begin{example}[Sample-normalised classifier]\label{ex:softmax}
+On the data of Example~\ref{ex:logreg} let
+\[
+\widetilde{P}_{\mathbf{2},d}(\cdot\mid\beta)
+= \bigotimes_{i\in u}\Bern\bigl(s_{i}(\beta,d)\bigr),
+\qquad
+s_{i} \;=\; \frac{e^{\beta(x(i))}}{\sum_{j\in u}e^{\beta(x(j))}},
+\]
+a softmax taken
+across the sample rather than across the label set. Again the $\catU$ slot
+fails: dropping a unit rescales every remaining probability. Normalisation
+across a batch is a routine operation in learning pipelines, so this is not a
+pathology invented for the purpose; its non-naturality is exactly the kind of
+obstruction that the cohomological formulation of \S\ref{sec:hochschild}
+detects and classifies.
+\end{example}
+
+\medskip
+\noindent The three slots may now be summarised as follows.
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+slot & what naturality asserts & what it rules out \\
+\midrule
+$\catU$ & marginal onto a subsample is the subsample model
+        & sample-dependent normalisation, empirical centring \\
+$\catO$ & parameter pulls back along covariate maps
+        & design-dependent reparametrisation \\
+$\catV$ & \emph{invariance} at fixed parameter
+        & relabelling, rescaling (these are equivariances) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The verifications above are elementary. Remark~\ref{cav:scaleV} is the one
+substantive point: with $\Theta$ defined on $\catO^{\op}$ alone,
+response-scale morphisms can express only invariance, so textbook equivariance
+statements about linear models lie outside Definition~\ref{def:designdata} as
+written.
+
+\begin{remark}[The one-way layout is Example~\ref{ex:linreg} in dummy
+coding]\label{rem:dummy}
+Write $\catD_{\mathrm{lab}}$ for the design category of
+Example~\ref{ex:oneway-setup} and $\catD_{\mathrm{lin}}$ for that of
+Example~\ref{ex:linreg}. Throughout this remark, $\omega$ denotes an object of
+$\catO_{\mathrm{lab}}$, a finite treatment-label set as in
+Example~\ref{ex:oneway-setup}, carrying no linear structure, \emph{not} the
+covariate space $\omega \cong \R^{p}$ of Example~\ref{ex:linreg}, which
+appears here as $\R[\omega]$.
+Let $\R[-] \colon \FinSet \to \Vect_{\R}^{\mathrm{fd}}$ be the
+free-vector-space functor and $\eta_{\omega} \colon \omega \to \R[\omega]$ the
+basis inclusion, one-hot coding of a treatment label, which is natural,
+$\R[\psi]\,\eta_{\omega} = \eta_{\omega'}\,\psi$. Then
+\[
+E(u,\omega,x) = \bigl(u,\ \R[\omega],\ \eta_{\omega} \circ x\bigr),
+\qquad
+E(\varphi,\psi) = (\varphi,\ \R[\psi])
+\]
+is a functor $\catD_{\mathrm{lab}} \to \catD_{\mathrm{lin}}$: it is
+well defined on morphisms because $\R[\psi]\eta_{\omega}x =
+\eta_{\omega'}\psi x = \eta_{\omega'}x'\varphi$, so~\eqref{eq:commacond} is
+transported. Under the canonical isomorphism $\R[\omega]^{*} \cong
+\R^{\omega}$, natural in $\omega$, one has $\Theta_{\mathrm{lab}} \cong
+\Theta_{\mathrm{lin}} \circ \R[-]^{\op}$ and $\beta(\eta_{\omega}x(i)) = \mu_{x(i)}$, whence
+\[
+P^{\mathrm{one\text{-}way}}_{\R,\,d} \;=\; P^{\mathrm{lin}}_{\R,\,E d}
+\qquad\text{for every } d \in \catD_{\mathrm{lab}} .
+\]
+The one-way layout is therefore the reindexing of the Gaussian linear model
+along $E$, and its naturality is inherited, a natural transformation
+restricting along any functor. Two things are \emph{not} inherited. First, the
+converse fails, for two distinct reasons. $E$ is faithful but not full: a
+morphism $(\varphi,\ell) \colon E(d) \to E(d')$ of $\catD_{\mathrm{lin}}$ must
+send $\eta_\omega(x(i))$ to $\eta_{\omega'}(x'(\varphi(i)))$ for every unit
+$i$, by~\eqref{eq:commacond}, which pins $\ell$ down to some $\R[\psi]$ on the
+levels actually observed in $d$ but leaves it an arbitrary linear map on the
+unobserved ones (when $x$ is surjective, every morphism from $E(d)$ to an
+object in the image of $E$ is itself in the image of $E$). And
+$\catD_{\mathrm{lin}}$ has objects outside the image of $E$ altogether,
+recoded designs, whose covariate vectors are contrasts or sum-to-zero codings
+rather than indicators, together with the morphisms into and among them
+that no treatment map induces; centring, being affine rather than linear, is
+not a morphism of $\catD_{\mathrm{lin}}$ at all. So
+naturality over $\catD_{\mathrm{lin}}$ is strictly stronger than naturality
+over $\catD_{\mathrm{lab}}$, and choosing label sets as $\catO$ is a
+substantive weakening of the demand, not a change of notation. Second, the
+cohomological test case of \S\ref{sec:hochschild} is computed over label
+morphisms, so it certifies obstructions relative to that smaller class only;
+this is one instance of the class-relativity insisted on in
+\S\ref{sec:hochschild}.
+\end{remark}
+
+\medskip
+\noindent\textbf{Example~\ref{ex:oneway-setup}, continued: verification of the
+one-way layout.} With the naturality squares \eqref{eq:ND}--\eqref{eq:NV} now
+displayed, we verify that the family of Example~\ref{ex:oneway-setup} is a
+McCullagh--Br\o ns model, and record what each condition says for it.
+
+\begin{proof}[Verification of~\eqref{eq:ND}]
+Let $f = (\varphi,\psi) \colon d \to d'$ and $\theta' = (\mu',\sigma^{2})$ on
+$\omega'$. Down-then-across, $\Theta(\psi)\theta' = (\mu' \circ
+\psi,\sigma^{2})$, so
+\[
+P_{\R,d}\bigl(\,\cdot \mid \Theta(\psi)\theta'\bigr)
+\;=\; \bigotimes_{i \in u} \Norm(\mu'_{\psi(x(i))},\ \sigma^{2}).
+\]
+Across-then-down, $P_{\R,d'}(\,\cdot \mid \theta') = \bigotimes_{j \in u'}
+\Norm(\mu'_{x'(j)},\sigma^{2})$, and pushing forward along $\res_{\varphi}$ is
+marginalisation onto the coordinates $\varphi(u) \subseteq u'$, which by
+independence gives $\bigotimes_{i \in u}
+\Norm(\mu'_{x'(\varphi(i))},\sigma^{2})$. The two agree because
+$x'(\varphi(i)) = \psi(x(i))$, which is~\eqref{eq:commacond}. As in
+Example~\ref{ex:linreg} the argument consumes exactly two structural facts:
+independence across units, so that marginalisation is coordinatewise, and the
+fact that the law of unit $i$ depends on the design only through $x(i)$.
+Condition~\eqref{eq:NV} is vacuous because $\catV$ is discrete.
+\end{proof}
+
+\noindent\textbf{What naturality says, slot by slot.} Specialising the
+naturality conditions~\eqref{eq:ND} and~\eqref{eq:NV} to morphisms living in
+a single slot, and writing (N-$\cat{C}$) for the resulting condition on
+morphisms of $\cat{C} \in \{\catU,\catO,\catV\}$:
+
+\begin{itemize}
+\item[(N-$\catU$)] $\psi = \id_{\omega}$, $\varphi$ a proper inclusion:
+the marginal of the layout on the subsample $\varphi(u)$ is the layout on that
+subsample, at the same $(\mu,\sigma^{2})$ and with the restricted assignment
+$x' \circ \varphi$. \emph{Consistency under subsampling.}
+
+\item[(N-$\catO$, merge)] $\varphi = \id_{u}$, $\psi$ surjective: the
+pulled-back mean vector $\mu' \circ \psi$ is constant on the blocks of $\psi$,
+and the square says that the fine-grained model evaluated at such a
+block-constant mean vector \emph{is} the merged model at $\mu'$. Naturality
+does not assert that merged groups have equal means; it asserts that on the
+subfamily where they do, the two descriptions of the experiment coincide.
+
+\item[(N-$\catO$, select)] $\psi$ injective: the same square read on a
+subfamily of treatments. For $\psi$ an inclusion $\omega \subseteq \omega'$
+this is design reduction, the covariate shadow of Tjur's sample-point
+removals, and by Lemma~\ref{lem:tjurshadow} the only part of (N-$\catO$, select)
+that his criterion reaches; a general injection adds a relabelling of the
+surviving groups, which his criterion does not see. The distinction is not
+idle: in Example~\ref{ex:oneway-findings}(i) the merge morphisms alone
+certify nothing, and it is the selection morphisms that detect the failure.
+
+\item[(N-$\catV$)] Vacuous here: by item~3 of
+Example~\ref{ex:oneway-setup}, $\catV$ has only identity morphisms, so
+\eqref{eq:NV} imposes nothing.
+\end{itemize}
+
+\noindent\textbf{Automorphisms: exchangeability and label equivariance.}
+Taking $d' = d$ with $\varphi,\psi$ bijections, \eqref{eq:commacond} forces
+$\varphi$ to carry $u_a$ onto $u_{\psi(a)}$, so
+\[
+\mathrm{Aut}_{\catD}(u,\omega,x)
+\;=\;
+\bigl\{(\varphi,\psi) : \psi \in \mathfrak{S}_{\omega},\ n_{\psi(a)} = n_a\ \forall a,\
+\varphi|_{u_a} \colon u_a \xrightarrow{\ \sim\ } u_{\psi(a)}\bigr\},
+\]
+an extension of the group of size-preserving relabellings by
+$\prod_{a \in \omega} \mathfrak{S}_{n_a}$, split once enumerations of the
+groups are chosen. Naturality at $(\varphi,\id)$ is invariance of
+$P_{\R,d}(\cdot \mid \theta)$ under permuting coordinates within groups, i.e.\
+\emph{within-group exchangeability}; naturality at a general $(\varphi,\psi)$
+is $(\res_{\varphi})_{*}P_{\R,d}(\cdot \mid \mu,\sigma^{2}) = P_{\R,d}(\cdot
+\mid \mu \circ \psi,\sigma^{2})$, i.e.\ \emph{equivariance} under relabelling
+of treatments. That equivariance is available in the $\catO$ slot but not
+in the $\catV$ slot is not an accident of this example: $\Theta$ is defined on
+$\catO^{\op}$, so a covariate morphism can act on the parameter, whereas a
+response-scale morphism cannot (Remark~\ref{cav:scaleV}).
+
+\noindent \textbf{Identifiability and design-conditional sufficiency.} $\Theta(\psi) = \psi^{*} \times \id$ is
+injective iff $\psi$ is surjective and surjective iff $\psi$ is injective.
+Independently of that, $\mu_a$ enters $P_{\R,d}$ only for $a \in x(u)$: at a
+design that leaves some treatment unobserved, $P_{\R,d}$ factors through the
+restriction $\R^{\omega} \to \R^{x(u)}$ and $\mu$ is identified only on the
+observed levels, the exact analogue, for label sets, of the column-rank
+condition of Remark~\ref{rem:identifiability}. The design-conditional
+sufficient statistic is the pair (group sample means on $x(u)$, pooled
+within-group sum of squares), and it is at this point that design-conditional
+sufficiency and identifiability enter.
+
+\section{Markov-categorical background}\label{sec:markov}
+
+We use only a small fragment of the theory; see~\cite{fritz_synthetic_2020,perrone_markov_2024}
+for the general framework.
+
+The \emph{Giry monad} $(\G,\eta,\mu)$ is the probability-distribution monad on $\Meas$.
+
+For a measurable space \(X=(X,\Sigma_X)\), $\G X$ is the set of all probability measures on \(X\). This set is itself equipped with a \(\sigma\)-algebra: namely, the smallest \(\sigma\)-algebra making all evaluation maps
+\[
+\operatorname{ev}_A:\mathcal G X\to [0,1],
+\qquad
+\operatorname{ev}_A(\mu)=\mu(A),
+\]
+measurable, for every \(A\in\Sigma_X\).
+
+Thus \(\mathcal G X\) is again a measurable space.
+
+If
+\[
+f: X\to Y
+\]
+is measurable, define
+\[
+\mathcal G f:\G X\to \G Y
+\]
+by pushforward:
+\[
+\G f(\pi)=f_\ast\pi,
+\]
+that is,
+\[
+(f_\ast\pi)(B)=\pi(f^{-1}(B)),
+\qquad
+B\in\Sigma_Y.
+\]
+
+Hence
+\[
+\mathcal G:\Meas\to\Meas
+\]
+is a functor.
+
+The unit of the monad is
+\[
+\eta_X:X\to \G X,
+\qquad
+\eta_X(x)=\delta_x,
+\]
+where \(\delta_x\) denotes the Dirac probability measure concentrated at \(x\).
+
+The multiplication of the monad is
+\[
+\mu_X:\G\G X\to\G X,
+\]
+defined by
+\[
+\mu_X(\Xi)(A)
+=
+\int_{\G X}\nu(A)\,d\Xi(\nu),
+\qquad
+A\in\Sigma_X.
+\]
+
+Thus an element \(\Xi\in\G\G X\), i.e.\ a probability distribution on the space of probability distributions on \(X\), is sent to its mixture.
+
+Equivalently, for every bounded measurable function \(h:X\to\mathbb R\),
+\[
+\int_X h(x)\,d\mu_X(\Xi)(x)
+=
+\int_{\G X}
+\left(
+\int_X h(x)\,d\nu(x)
+\right)
+d\Xi(\nu).
+\]
+
+The triple
+\[
+(\G,\eta,\mu)
+\]
+satisfies the monad laws.
+
+A Kleisli morphism for the Giry monad from \(X\) to \(Y\) is a measurable map
+\[
+K:X\to\G Y.
+\]
+Equivalently, it is a Markov kernel
+\[
+K:X\times\Sigma_Y\to[0,1]
+\]
+such that, for every \(x\in X\),
+\[
+B\mapsto K(x,B)
+\]
+is a probability measure on \(Y\), and for every \(B\in\Sigma_Y\),
+\[
+x\mapsto K(x,B)
+\]
+is measurable.
+
+Given two Kleisli morphisms
+\[
+K:X\to\G Y,
+\qquad
+L:Y\to\G Z,
+\]
+their Kleisli composition is
+\[
+L\odot K:X\to\G Z
+\]
+defined by
+\[
+(L\odot K)(x)(C)
+=
+\int_Y L(y)(C)\,dK(x)(y),
+\qquad
+C\in\Sigma_Z.
+\]
+
+In other words, the Kleisli category of the Giry monad has measurable spaces as objects and Markov kernels as morphisms. This leads to the following definition.
+
+\begin{definition}
+The Kleisli category of the Giry monad is called $\Stoch$, and it is the category whose objects are measurable spaces and whose morphisms $f \colon X \rightsquigarrow Y$ are Markov kernels
+$f \colon X \times \Sigma_Y \to [0,1]$, composed by the
+Chapman--Kolmogorov formula, see~\cite{fritz_synthetic_2020, giry_categorical_1982,perrone_markov_2024}.
+There is a natural bijection
+\begin{equation}\label{eq:kleisli}
+\Stoch(X, Y) \;\cong\; \Meas\bigl(X, \G Y\bigr).
+\end{equation}
+
+$\FinStoch$ is the full subcategory of finite discrete measurable spaces;
+morphisms are stochastic matrices. 
+
+$\Stoch$ is a Markov category: symmetric
+monoidal under the product of measurable spaces, with copy and discard maps at
+every object, naturality being imposed on discard
+alone~\cite[Def.~2.1]{fritz_synthetic_2020}; we write
+$\mathrm{copy}_{X} \colon X \to X \otimes X$ for the copy map at $X$.
+
+A morphism $f \colon X \to Y$ of a Markov category is \emph{deterministic} if
+it is a homomorphism of the copy comonoids, that is, if
+\[
+\mathrm{copy}_{Y} \circ f \;=\; (f \otimes f) \circ \mathrm{copy}_{X}
+\]
+\cite[Def.~10.1]{fritz_synthetic_2020}. 
+Read left to right, the condition
+says that running $f$ once and duplicating its output agrees with duplicating
+the input and running $f$ twice independently; any genuine randomness in $f$
+breaks this, since two independent runs need not agree. In $\Stoch$ the
+condition says exactly that $f(x,B) \in \{0,1\}$ for every $x \in X$ and every
+$B \in \Sigma_{Y}$, i.e.\ that each $f(x,\cdot)$ is a $\{0,1\}$-valued
+measure~\cite[Ex.~10.4]{fritz_synthetic_2020}; in $\FinStoch$, that the
+stochastic matrix of $f$ has entries in $\{0,1\}$. Deterministic morphisms
+contain the identities and are closed under composition and under $\otimes$,
+so they form a wide symmetric monoidal subcategory
+$\Stoch_{\det} \subseteq \Stoch$.
+
+\end{definition}
+
+
+\begin{definition}\label{def:dirac}
+The \emph{Dirac embedding} $\del \colon \Meas \to \Stoch$ is the identity on
+objects and sends a measurable map $f$ to the kernel
+$x \mapsto \delta_{f(x)}$. It is strong monoidal and lands in
+$\Stoch_{\det}$, since a Dirac kernel is $\{0,1\}$-valued; it is faithful on
+the measurable maps into $Y$ exactly when $\Sigma_{Y}$ separates points (so on
+all standard Borel, discrete and finite codomains, but not on $\Meas$ as a
+whole). The converse,
+that every deterministic $X \rightsquigarrow Y$ is $\del$ of a measurable map,
+is not automatic: it asks that the $\{0,1\}$-valued measures on $Y$ be
+exactly its points. This holds when $\Sigma_{Y}$ is countably generated and
+separates points, in particular for standard Borel $Y$, and always in
+$\FinStoch$~\cite[Ex.~10.4]{fritz_synthetic_2020}. Hypotheses~(a) and~(b) of
+Proposition~\ref{wprop:copower} are the two instances of this requirement that
+arise below; see Remark~\ref{cav:Bscope} (ii).
+\end{definition}
+
+Two facts are used below without further comment: $(\mathrm{i})$
+correspondence~\eqref{eq:kleisli} is natural in $X$ (via precomposition with
+measurable maps) and in $Y$ (via pushforward); $(\mathrm{ii})$ a diagram of
+Dirac kernels $\del f_{j}$ commutes in $\Stoch$ iff the diagram of the
+$f_{j}$ commutes in $\Meas$, provided the codomains involved separate points,
+since $\del$ is faithful.
+
+\begin{remark}[What Markov categories add]\label{rem:whatmarkovadds}
+The point of the change of codomain in Section~\ref{sec:bridge} is not
+notational. Once a model lands in $\Stoch$, the synthetic apparatus
+of~\cite{fritz_synthetic_2020}, a.s.-equality and the synthetic Fisher--Neyman
+characterisation of sufficiency (which requires strict positivity, available in
+$\Stoch$~\cite[Ex.~13.19, Thm.~14.5]{fritz_synthetic_2020}, not conditionals,
+which $\Stoch$ lacks in general~\cite[Ex.~11.3]{fritz_synthetic_2020}), applies to each
+component $P_{v,d}$ \emph{inside} the category, while McCullagh--Br\o ns
+naturality constrains the family \emph{across} components. The two mechanisms
+compose: e.g.\ sufficiency of a statistic for every design, plus naturality of
+the statistic, is a statement with actual content about the whole diagram,
+not a componentwise remark. Making such combined statements provable is the
+purpose of the bridge.
+\end{remark}
+
+\section{The bridge}\label{sec:bridge}
+
+The observation driving everything is: by~\eqref{eq:kleisli}, a
+component $P_{v,d} \colon U_\catK\Theta(\omega) \to \Prb(\Gamma(v,u))$ of a
+McCullagh--Br\o ns model \emph{wants} to be a morphism
+$\Theta(\omega) \rightsquigarrow \Gamma(v,u)$ in $\Stoch$, the only gap between
+Definition~\ref{def:mcbmodel} and that statement is measurability in
+$\theta$, which the $\Set$-valued formulation cannot see. In the finite case
+the gap vanishes, and the translation is an equivalence; in general it is an
+added hypothesis, which we make explicit.
+
+\subsection{Finite case}
+
+Assume the data of Definition~\ref{def:designdata} are \emph{finite}: $\catV$,
+$\catO$, $\catU$ take values with finite underlying sets, $\Gamma$ lands in finite
+discrete spaces, and $U_\catK\Theta(\omega)$ is finite for every $\omega$.
+Equip each $U_\catK\Theta(\omega)$ with its discrete measurable structure, so
+that $U_\catK\Theta$ lifts (uniquely) to a functor
+$\Theta_\Meas \colon \catO^{\op} \to \Meas$ with
+$U_\catK \Theta = |\!-\!| \circ \Theta_\Meas,$ where $|\!-\!|:\Meas\to\Set$ is
+the forgetful functor.
+
+Define two functors into $\FinStoch$:
+\[
+\mathbf{L} \coloneqq \del \circ \Theta_\Meas \circ \pr_\catO^{\op} \circ \pr_2,
+\qquad
+\mathbf{R} \coloneqq \del \circ \Gamma \circ (\id_\catV \times \pr_\catU^{\op}),
+\]
+both $\catV \times \catD^{\op} \to \FinStoch$, where $\del$ is the Dirac
+embedding of Definition~\ref{def:dirac}.
+
+\begin{theorem}[Bridge, finite case]\label{thm:bridge-finite}
+There is a canonical bijection between:
+\begin{enumerate}
+\item McCullagh--Br\o ns models $P \colon L \Rightarrow R$
+(Definition~\ref{def:mcbmodel});
+\item families of morphisms
+$\mathbf{P}_{v,d} \colon \mathbf{L}(v,d) \rightsquigarrow \mathbf{R}(v,d)$ in
+$\FinStoch$, indexed by the objects of $\catV\times\catD^{\op}$, such that for
+every morphism $m$ of $\catV \times \catD^{\op}$ the square
+\begin{equation}\label{eq:natsquare}
+\begin{tikzcd}[column sep=3em]
+\mathbf{L}(v,d) \arrow[r, rightsquigarrow, "\mathbf{P}_{v,d}"]
+\arrow[d, "\mathbf{L}(m)"']
+& \mathbf{R}(v,d) \arrow[d, "\mathbf{R}(m)"] \\
+\mathbf{L}(v',d') \arrow[r, rightsquigarrow, "\mathbf{P}_{v',d'}"']
+& \mathbf{R}(v',d')
+\end{tikzcd}
+\end{equation}
+commutes in $\FinStoch$; i.e.\ natural transformations
+$\mathbf{P}\colon \mathbf{L} \Rightarrow \mathbf{R}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}[Where the probability sits in the square]\label{rem:squareshape}
+In~(2), the vertical arrows $\mathbf{L}(m) = \del\,\Theta_\Meas(\psi)$ and
+$\mathbf{R}(m) = \del\,\Gamma(\alpha,\varphi)$ are Dirac kernels, hence
+deterministic, by the definition of $\mathbf{L}$ and $\mathbf{R}$; only the
+components $\mathbf{P}_{v,d}$ carry probability, and these are arbitrary
+stochastic matrices (Dirac only when the model is degenerate).
+\end{remark}
+
+\begin{proof}[Proof of Theorem~\ref{thm:bridge-finite}]
+Write $d = (u,\omega,x)$, so that
+$\mathbf{L}(v,d) = \del\Theta_\Meas(\omega)$ and
+$\mathbf{R}(v,d) = \del\Gamma(v,u)$; since $\del$ is the identity on objects,
+these are the measurable spaces $\Theta_\Meas(\omega)$ and $\Gamma(v,u)$,
+both finite and discrete.
+
+\emph{Step 1 (object level: transposition).} Fix $(v,d)$. We claim a bijection
+\begin{equation}\label{eq:transpose}
+\Set\bigl(U_\catK\Theta(\omega),\, \Prb(\Gamma(v,u))\bigr)
+\;\xrightarrow{\ \cong\ }\;
+\FinStoch\bigl(\Theta_\Meas(\omega),\, \Gamma(v,u)\bigr),
+\qquad P_{v,d} \longmapsto \mathbf{P}_{v,d}.
+\end{equation}
+Indeed $U_\catK\Theta(\omega)$ is by construction the underlying set of the
+discrete space $\Theta_\Meas(\omega)$, and $\Prb(S)$ is the underlying set of
+the measurable space $\G S$. Because $\Theta_\Meas(\omega)$ is discrete,
+\emph{every} function out of it is measurable, so
+$\Set\bigl(U_\catK\Theta(\omega), \Prb(\Gamma(v,u))\bigr)
+= \Meas\bigl(\Theta_\Meas(\omega), \G\Gamma(v,u)\bigr)$, an equality of
+sets, not merely an inclusion. This is the component of the adjunction
+$D \dashv U$ of Proposition~\ref{prop:coreflection} at
+$\bigl(U_\catK\Theta(\omega), \G\Gamma(v,u)\bigr)$; what is done here by hand
+at one pair of objects is done there uniformly. This is the only place where
+discreteness of the parameter object is used, finiteness of the spaces
+serves only to place $\mathbf{L}$, $\mathbf{R}$ and $\mathbf{P}$ in
+$\FinStoch$ rather than in $\Stoch$, and it is exactly the gap
+identified before Definition~\ref{def:mcbmodel}: in general one must
+\emph{require} measurability in $\theta$. Composing with~\eqref{eq:kleisli}
+gives~\eqref{eq:transpose}. Explicitly, $\mathbf{P}_{v,d}$ is the kernel
+$\theta \mapsto P_{v,d}(\,\cdot \mid \theta)$, the same data read as a
+morphism rather than as a $\Prb$-valued function.
+
+\emph{Step 2 (morphism level: both sides are deterministic).} Let
+$m = (\alpha, (\varphi,\psi)^{\op})$ be a morphism of
+$\catV \times \catD^{\op}$, with target $(v',d')$, $d' = (u',\omega',x')$, so
+that $(\varphi,\psi) \colon d' \to d$ in $\catD$, with
+$\varphi \colon u' \to u$ and $\psi \colon \omega' \to \omega$. On
+the $\Set$ side $L(m) = U_\catK\Theta(\psi)$ and
+$R(m) = \Prb\bigl(\Gamma(\alpha,\varphi)\bigr)$, the latter being pushforward
+of measures along $\Gamma(\alpha,\varphi)$. On the $\FinStoch$ side, by
+definition of $\mathbf{L}$ and $\mathbf{R}$,
+\[
+\mathbf{L}(m) = \del\bigl(\Theta_\Meas(\psi)\bigr),
+\qquad
+\mathbf{R}(m) = \del\bigl(\Gamma(\alpha,\varphi)\bigr),
+\]
+so the vertical arrows of~\eqref{eq:natsquare} are Dirac kernels: $\mathbf{L}$
+and $\mathbf{R}$ send every morphism to a deterministic kernel, while nothing
+constrains $\mathbf{P}_{v,d}$ itself.
+
+\emph{Step 3 (the two transposition rules).} Recall that composition in
+$\Stoch$ is given by
+$(k' \circ k)(x)(B) = \int k'(y)(B)\, k(x)(\mathrm{d}y)$.
+Two special cases are all we need. For a measurable $g \colon Y \to Y'$ and a kernel
+$k \colon X \rightsquigarrow Y$,
+\begin{equation}\label{eq:push}
+\bigl(\del(g) \circ k\bigr)(x)(B)
+= \int \delta_{g(y)}(B)\, k(x)(\mathrm{d}y)
+= k(x)\bigl(g^{-1}B\bigr)
+= \bigl(\G(g) \circ k\bigr)(x)(B),
+\end{equation}
+so postcomposing with $\del(g)$ in $\FinStoch$ \emph{is} postcomposing with
+the pushforward $\Prb(g) = \G(g)$ under~\eqref{eq:transpose}. Dually, for a
+measurable $h \colon X' \to X$,
+\begin{equation}\label{eq:pull}
+\bigl(k \circ \del(h)\bigr)(x')(B)
+= \int k(x)(B)\, \delta_{h(x')}(\mathrm{d}x)
+= k\bigl(h(x')\bigr)(B),
+\end{equation}
+so precomposing with $\del(h)$ is precomposing with $h$ itself. These are
+the two naturality statements of~\eqref{eq:kleisli} recorded after
+Definition~\ref{def:dirac}, here written out in full.
+
+\emph{Step 4 (squares correspond).} The $\Set$-naturality square for $P$ at
+$m$ is the equality of functions
+$U_\catK\Theta(\omega) \to \Prb(\Gamma(v',u'))$
+\[
+\Prb\bigl(\Gamma(\alpha,\varphi)\bigr) \circ P_{v,d}
+\;=\; P_{v',d'} \circ U_\catK\Theta(\psi).
+\]
+Transpose each side under~\eqref{eq:transpose}. By~\eqref{eq:push} the
+left-hand side transposes to
+$\del\bigl(\Gamma(\alpha,\varphi)\bigr) \circ \mathbf{P}_{v,d}
+= \mathbf{R}(m) \circ \mathbf{P}_{v,d}$; by~\eqref{eq:pull} the right-hand
+side transposes to
+$\mathbf{P}_{v',d'} \circ \del\bigl(\Theta_\Meas(\psi)\bigr)
+= \mathbf{P}_{v',d'} \circ \mathbf{L}(m)$. Since~\eqref{eq:transpose} is a
+bijection of hom-sets, the two functions are equal if and only if the two
+kernels are equal, i.e.\ if and only if square~\eqref{eq:natsquare} commutes.
+
+\emph{Step 5 (conclusion).} Steps~1 and~4 give, for each family, a family with
+the same index set and the same commuting squares, and the assignment
+$P_{v,d} \mapsto \mathbf{P}_{v,d}$ is invertible objectwise
+by~\eqref{eq:transpose}, with the inverse governed by the same two rules read
+right to left. Hence natural transformations $P \colon L \Rightarrow R$
+correspond bijectively to natural transformations
+$\mathbf{P} \colon \mathbf{L} \Rightarrow \mathbf{R}$. The final assertions
+are Step~2 together with the observation that $\mathbf{P}_{v,d}$ lies in the
+image of $\del$ precisely when each $P_{v,d}(\,\cdot \mid \theta)$ is a Dirac
+measure, which is not required of a statistical model.
+\end{proof}
+
+The proof is a Kleisli-transposition argument; its value is not depth but the
+licence it grants: every synthetic notion available in $\FinStoch$ applies to
+finite McCullagh--Br\o ns models verbatim.
+
+
+
+\medskip
+\noindent\textbf{Is finiteness a conceptual restriction? Rounding as a
+$\catV$-morphism.}
+A natural objection to the finiteness hypothesis of
+Theorem~\ref{thm:bridge-finite} is that it costs nothing: responses are
+bounded by the range of any real instrument, covariate ranges are bounded for
+the same reason, and a real number recorded in a $64$-bit floating-point
+representation takes one of finitely many values, so the data of any actual
+experiment are finite and Theorem~\ref{thm:bridge-finite} already covers
+everything that is ever computed. Half of this is correct and worth recording
+precisely; the other half is not, and the two halves are best kept apart.
+
+\emph{What is correct.} Fix $M > 0$ and a finite grid $F \subset [-M,M]$,
+for definiteness, the floating-point numbers representable in that range,
+and let $\rho \colon \R \to F$ be rounding, with values outside $[-M,M]$
+clamped to the extreme grid points. Then $\rho$ is Borel measurable and
+surjective, hence precisely a coarsening morphism of the kind item~3 (the
+response-scale category $\catV$) of Definition~\ref{def:designdata} admits.
+Enlarge the response-scale category accordingly: let $\catV_{F}$ have the two
+objects $\R$ and $F$, the grid carrying the discrete $\sigma$-algebra,
+and, besides the identities, the single morphism $\rho \colon \R \to F$; this
+is again a response-scale category in the sense of
+Definition~\ref{def:designdata}(3), and $\Gamma$ extends canonically by
+$\Gamma(F,u) = F^{u}$. Setting
+\[
+P_{F,d}(\,\cdot \mid \theta) \;\coloneqq\; (\rho^{u})_{*}\,P_{\R,d}(\,\cdot
+\mid \theta)
+\]
+makes~\eqref{eq:NV} hold by construction, and every component now has finite
+codomain. Two things follow. First, quantisation is not external to the
+framework and not an approximation to the model: the discretised model
+\emph{is} the image of the model under a morphism of the enlarged response-scale category $\catV_{F}$, obtained with no
+hypothesis and no error term, and recorded data always live in the image of
+such a morphism. Second, this is one of the rare non-identity response-scale morphisms
+genuinely available to the Gaussian models of \S\ref{sec:worked}: unlike affine
+rescaling, which acts on the parameter and therefore lies outside
+Definition~\ref{def:designdata} as written (Remark~\ref{cav:scaleV}), rounding
+is compatible with the model \emph{at the same parameter value}, which is
+exactly what~\eqref{eq:NV} demands.
+
+\emph{What is not correct.} The argument does not reduce
+Theorem~\ref{thm:bridge-meas} to Theorem~\ref{thm:bridge-finite}, for three
+independent reasons.
+
+\emph{(a) It discretises the sample side only.} The hypothesis of
+Theorem~\ref{thm:bridge-finite} also requires $U_\catK\Theta(\omega)$ to be
+finite. Rounding is a morphism of $\catV$ and leaves the parameter functor
+$\Theta$ untouched, whatever it is; in every model of \S\ref{sec:worked} the
+parameter objects are continua, $\R^{\omega} \times \R_{>0}$ in the
+one-way layout of Example~\ref{ex:oneway-setup}, for instance, so
+$P_{F,d}$ is still a family indexed by a continuum: it is an object for
+Theorem~\ref{thm:bridge-meas}, whose measurability hypothesis it inherits
+from $P_{\R,d}$ rather than avoids.
+
+\emph{(b) Discretising the parameter as well does not in general yield an
+instance of Definition~\ref{def:designdata}.} Where $\Theta(\psi)$ is mere
+reindexing, as in the one-way layout, a finite grid of parameter values is
+preserved and Theorem~\ref{thm:bridge-finite} applies; this is the setting
+of \S\ref{sec:hochschild}. Where $\Theta(\psi) = \psi^{*}$ uses the linear
+structure of the covariate category, as in Examples~\ref{ex:linreg}
+and~\ref{ex:logreg}, it does not: a floating-point grid is not closed under
+arithmetic, addition is not associative on it and $\rho(a+b) \neq
+\rho(a)+\rho(b)$ in general, so $F^{p}$ is not a vector space, the covariate
+category $\Vect_{\R}^{\mathrm{fd}}$ of Example~\ref{ex:linreg} has no
+floating-point analogue, and $\Theta(\psi) = \psi^{*}$ would be functorial only
+up to rounding. Naturality is an \emph{equational} condition: the squares would
+commute approximately, and no notion of approximate naturality is developed
+here. The computation of \S\ref{sec:hochschild} is carried out in exact
+arithmetic for this reason. Formulating an $\varepsilon$-naturality with a
+quantitative obstruction is a reasonable question and would be the honest home
+for numerical claims; nothing in this draft supplies one.
+
+\emph{(c) The statistical content is not preserved by $\rho_{*}$.} The
+pushforward of a Gaussian family along $\rho$ is not an exponential family, and
+the pair (group means, within-group sum of squares) is not sufficient for it.
+Statements about sufficiency and about exponential families are theorems about
+the continuum object; its finite images do not inherit them.
+
+\medskip
+\emph{The correct relation is a limit, not a rounding.} Let $(\rho_n \colon S \to F_n)_{n}$ be a
+refining sequence of finite quantisations whose cells generate the Borel
+$\sigma$-algebra of $S$. Since the cells form a generating $\pi$-system, a
+probability measure is determined by its pushforwards, so the canonical map
+$\Prb(S) \to \varprojlim_n \Prb(F_n)$ is injective: nothing studied here is
+invisible at finite level, and in this sense finiteness is indeed not a
+conceptual limitation. But the map is not a bijection for free: the projective
+limit $\hat S = \varprojlim_n F_n$ is a compact zero-dimensional space into
+which $S$ embeds, and $\varprojlim_n \Prb(F_n) \cong \Prb(\hat S)$ by a
+Kolmogorov-type extension theorem; $\Prb(S)$ is then the subset of measures
+carried by the image of $S$, which is Borel for standard Borel $S$ but is
+proper in general (for the dyadic quantisation of $[0,1)$ the consistent
+family concentrating on the cells $[\tfrac12 - 2^{-n}, \tfrac12)$ has no
+preimage). It is at exactly that point that the regularity hypothesis of
+Theorem~\ref{thm:bridge-meas} reappears rather than disappears.
+The measurable case is thus the projective limit of the finite ones, not a
+special case of them, and cannot be dispensed with by quantising the data.
+
+The injectivity of $\Prb(S) \to \varprojlim_n \Prb(F_n)$ is elementary; the
+identification of the projective limit with $\Prb(\hat S)$ is classical but
+is not used below. 
+
+\subsection{Measurable case}
+
+\begin{theorem}[Bridge, measurable case]\label{thm:bridge-meas}
+Suppose the $\Set$-valued parameter functor
+$U_\catK\Theta \colon \catO^{\op} \to \Set$ lifts to a functor
+$\Theta_\Meas \colon \catO^{\op} \to \Meas$ along the underlying-set functor
+$|\!-\!| \colon \Meas \to \Set$, that is,
+$|\!-\!| \circ \Theta_\Meas = U_\catK \circ \Theta$ (i.e.\ each parameter
+object carries a measurable structure and the reparametrisation maps
+$\Theta(\psi)$ are measurable), and let
+$P \colon L \Rightarrow R$ be a McCullagh--Br\o ns model such that each
+component $P_{v,d} \colon U_\catK\Theta(\omega) \to \Prb(\Gamma(v,u))$ is
+measurable as a map $\Theta_\Meas(\omega) \to \G \Gamma(v,u)$ (equivalently:
+$\theta \mapsto P_{v,d}(A \mid \theta)$ is measurable for every measurable
+$A$); call such a $P$ a \emph{measurable model}. Define
+$\mathbf{L}, \mathbf{R} \colon \catV \times \catD^{\op} \to \Stoch$ by the
+same formulas as in the finite case,
+$\mathbf{L} = \del\,\Theta_\Meas\,\pr_\catO^{\op}\,\pr_2$ and
+$\mathbf{R} = \del\,\Gamma\,(\id_\catV \times \pr_\catU^{\op})$. Then the
+conclusion of Theorem~\ref{thm:bridge-finite} holds with $\FinStoch$ replaced
+by $\Stoch$: there is a canonical bijection between measurable models and
+natural transformations $\mathbf{P} \colon \mathbf{L} \Rightarrow \mathbf{R}$;
+the arrows $\mathbf{L}(m)$, $\mathbf{R}(m)$ are Dirac kernels and hence
+deterministic (Definition~\ref{def:dirac}), with no further hypothesis;
+and each component $\mathbf{P}_{v,d}$ is a kernel that need not be
+deterministic.
+\end{theorem}
+
+\begin{proof}
+As in the finite case, with Step~1 replaced by the measurability hypothesis:
+\eqref{eq:kleisli} and its naturality hold for arbitrary measurable spaces;
+measurability of $P_{v,d}$ is exactly what places it in the hom-set
+\[
+\Meas\bigl(\Theta_\Meas(\omega),\,\G\Gamma(v,u)\bigr)
+\]
+that \eqref{eq:kleisli} transposes; and the square-transposition argument
+(Steps~3--4) uses only naturality of the Kleisli bijection, not finiteness.
+\end{proof}
+
+\begin{remark}[The hypotheses are a genuine restriction]\label{rem:hypotheses}
+McCullagh's formulation is $\Set$-valued: parameter objects are bare sets (or
+objects of an abstract concrete category $\catK$), and no measurability in
+$\theta$ is imposed. Theorem~\ref{thm:bridge-meas} therefore does \emph{not}
+say ``every McCullagh--Br\o ns model lives in $\Stoch$''; it says the ones
+satisfying a mild regularity hypothesis do. Two mitigations. (i) Every
+statistical model used in practice, in particular every exponential-family
+model, and all examples in~\cite{mccullagh_what_2002} with finite-dimensional
+parameter spaces, satisfies the hypothesis with the obvious Borel structures
+(the measure- and function-valued parameter spaces of~\cite[\S8]{mccullagh_what_2002}
+would require a choice of $\sigma$-algebra, not pursued here); kernels $\theta \mapsto P_\theta$ with
+measurable dependence are the standard regularity assumption of decision
+theory. (ii) The hypothesis is not merely harmless but \emph{clarifying}: the
+$\Set$-valued formulation silently permits models to which no measure-theoretic
+statistical procedure (risk, Bayes, estimation) could be applied; the bridge
+makes the regularity requirement part of the type. The bridge should
+therefore be stated with this hypothesis, not without it.
+\end{remark}
+
+\begin{caveat}[No claim of essential surjectivity onto synthetic models]
+The bridge exhibits McCullagh--Br\o ns models as certain diagrams in
+$\Stoch$. It does not claim that every ``statistical model'' definable
+synthetically in an abstract Markov category arises this way, nor that
+$\Stoch$ is the only reasonable codomain (quasi-Borel spaces~\cite{heunen_convenient_2017}
+or Borel spaces are alternatives with better categorical properties). The
+choice of $\Stoch$ is the minimal one supporting the classic examples.
+\end{caveat}
+
+\begin{example}[One-way layout, continued]\label{ex:oneway-cont}
+In Example~\ref{ex:oneway-setup}, $\Theta(\omega)=\R^\omega\times\R_{>0}$
+with its Borel structure; measurability of
+$(\mu,\sigma^2) \mapsto \bigotimes_i N(\mu_{x(i)},\sigma^2)$ is classical.
+Theorem~\ref{thm:bridge-meas} applies, and the three naturality conditions
+listed in Example~\ref{ex:oneway-setup} become commuting squares of kernels.
+\end{example}
+
+
+\subsection{The category of statistical models, reformulated}\label{sec:Bref}
+
+It is natural to ask whether Br\o ns' category of statistical models is
+identified with a category built canonically from $\Stoch$: objects its
+morphisms, morphisms the commuting squares with deterministic sides. The following remark lets us say precisely
+how much of it is true.
+
+\begin{remark}[The bridge is a representability computation]\label{rem:repr}
+The proof of Theorem~\ref{thm:bridge-finite} is elementary because it is, in disguise, the composite of
+two standard facts. Isolating them is worth the space: they explain what the finiteness
+hypothesis is doing, and they are what the rest of this section runs on.
+
+\emph{(i) The probability functor is representable in $\Stoch$.} The monoidal
+unit $I$ of $\Stoch$ is the one-point measurable space, and
+\[
+\Stoch(I,S) \;=\; \Meas(1,\G S) \;=\; \G S \;=\; \Prb(S),
+\]
+naturally in $S$; that is, $\Prb \cong \Stoch(I,-)$. A probability measure is a
+generalised element at the unit, which is the precise content of the
+standard slogan that probability measures are \emph{states}.
+
+\emph{(ii) Discrete parameter sets are copowers of the unit.} The Dirac
+embedding $\del$ (Definition~\ref{def:dirac}) is the free functor of the
+Kleisli adjunction $\Meas \rightleftarrows \Stoch$, hence a left adjoint,
+hence preserves colimits. Coproducts in $\Meas$ are disjoint unions (with the
+disjoint-union $\sigma$-algebra), so for any set $A$,
+\[
+\del\bigl(A,2^A \bigr) \;\cong\; \coprod_{A} I \;=:\; A\cdot I .
+\]
+
+Combining, for any set $A$ and measurable space $S$,
+\begin{equation}\label{eq:copower}
+\Set\bigl(A,\Prb(S)\bigr)
+\;\cong\;
+\Set\bigl(A,\Stoch(I,S)\bigr)
+\;\cong\;
+\Stoch\bigl(A\cdot I,\;S\bigr),
+\end{equation}
+which is exactly the instance of~\eqref{eq:kleisli} used in the proof of
+Theorem~\ref{thm:bridge-finite}.
+
+Two consequences. First, determinism of the parameter side is not an extra
+observation about the finite case: it is the statement that the domain object
+is a copower of $I$ and that $\mathbf{L}$ sends every morphism to the Dirac
+kernel of a map of the indexing sets, so $\mathbf{L}$ lands in the image of
+$\del$ by construction.
+Second, the finiteness hypothesis is doing two separable jobs, it makes
+every set-map into $\Prb(S)$ a kernel (that is~\eqref{eq:copower}), and it
+makes $\del$ full and faithful onto deterministic morphisms (that is the
+converse recorded in Definition~\ref{def:dirac}), and only the second is a
+genuine restriction,
+since~\eqref{eq:copower} holds verbatim over arbitrary sets.
+
+Proposition~\ref{prop:brons} admits the same reading one level up: the comma
+category $(\id_{\Set}\downarrow\Prb)$ represents, as an object of $\Cat$ and
+up to the evident $2$-categorical refinements, the
+assignment $\cat{A} \mapsto \{(G,H,\alpha) \mid \alpha \colon G \Rightarrow
+\Prb H\}$, and the universal property invoked in its proof is the
+corresponding representability argument.
+\end{remark}
+
+
+
+
+\begin{definition}\label{def:arrdet}
+Let $q \colon X \rightsquigarrow Y$ and $q' \colon X' \rightsquigarrow Y'$ be
+morphisms of $\Stoch$. A \emph{square} from $q$ to $q'$ is a pair $(a,b)$ of
+deterministic morphisms $a \colon X \rightsquigarrow X'$,
+$b \colon Y \rightsquigarrow Y'$ such that
+\[
+\begin{tikzcd}[column sep=2.6em, row sep=2.2em]
+X \arrow[r, squiggly, "q"] \arrow[d, squiggly, "a"'] & Y \arrow[d, squiggly, "b"] \\
+X' \arrow[r, squiggly, "q'"'] & Y'
+\end{tikzcd}
+\qquad\qquad
+q' \circ a \;=\; b \circ q \quad\text{in } \Stoch .
+\]
+We call $a$ and $b$ the \emph{legs} of the square. Squares compose
+componentwise, $(a',b') \circ (a,b) = (a' \circ a,\, b' \circ b)$, and
+$(\id_X,\id_Y)$ is a square from $q$ to itself; since the deterministic
+morphisms form a subcategory $\Stoch_{\det}$ (\S\ref{sec:markov}), this
+defines a category $\Arrdet{\Stoch}$ whose objects are \emph{all} the
+morphisms of $\Stoch$ and whose morphisms are the squares. Two subcategories
+are needed below:
+\begin{enumerate}
+\item[(i)] $\Arrcop{\Stoch}$, the full subcategory on the objects
+$q \colon X \rightsquigarrow Y$ whose domain $X$ is isomorphic in $\Stoch$ to
+a copower $A \cdot I$ of the monoidal unit;
+\item[(ii)] $\Arrim{\Stoch}$, the wide subcategory whose morphisms are the
+squares with both legs in the image of the Dirac embedding $\del$
+(Definition~\ref{def:dirac}); it is closed under composition because $\del$
+is a functor.
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}[Pointwise form of a square]\label{lem:square-pointwise}
+Let $f \colon X \to X'$ and $g \colon Y \to Y'$ be measurable maps. Then
+$(\del f, \del g)$ is a square from $q$ to $q'$ if and only if
+\[
+q'\bigl(f(x)\bigr) \;=\; g_{*}\, q(x)
+\qquad\text{in } \Prb(Y'), \text{ for every } x \in X .
+\]
+\end{lemma}
+
+\begin{proof}
+By~\eqref{eq:pull}, $(q' \circ \del f)(x) = q'(f(x))$; by~\eqref{eq:push},
+$(\del g \circ q)(x) = g_{*}\, q(x)$.
+\end{proof}
+
+\begin{remark}[Deterministic legs versus Dirac legs]\label{rem:arrim}
+$\Arrim{\Stoch} \subseteq \Arrdet{\Stoch}$ because Dirac kernels are
+deterministic, and the inclusion is an equality in $\FinStoch$. In general the
+deterministic morphisms into a space $Z$ are all Dirac kernels exactly when
+every $\{0,1\}$-valued measure on $Z$ is a Dirac measure, the converse
+recorded in Definition~\ref{def:dirac}; if some $\{0,1\}$-valued measure
+$\nu$ on $Z$ is not Dirac, the constant kernel at $\nu$ is deterministic but
+not in the image of $\del$. Hence every square with legs into $X'$ and $Y'$
+lies in $\Arrim{\Stoch}$ when this holds for $X'$ and for $Y'$, in particular
+when they satisfy hypothesis~(b) of Proposition~\ref{wprop:copower}.
+Hypothesis~(b) is sufficient but not necessary: hypothesis~(a) of the same
+proposition describes discrete spaces on which every $\{0,1\}$-valued measure
+is Dirac although the $\sigma$-algebra need not be countably generated. The
+parameter set of the one-way layout is a case in point: $\R^{\omega} \times
+\R_{>0}$ with the discrete $\sigma$-algebra, which is what $\Theta_0 \cdot I$
+is for $\Theta_0 = U_\catK\Theta(\omega)$ of Example~\ref{ex:oneway-setup},
+has the cardinality of the continuum, below the first measurable cardinal, so
+every countably additive $\{0,1\}$-valued measure on it is Dirac; but a
+countably generated $\sigma$-algebra has at most continuum many elements,
+while the discrete one has $2^{|\R|}$.
+\end{remark}
+
+\begin{proposition}[Object-level form of the identification]\label{wprop:copower}
+Transposition across~\eqref{eq:copower} extends to a functor
+\[
+\Jc \colon \StatMod \longrightarrow \Arrdet{\Stoch},
+\qquad
+(\Theta_0, S, p) \longmapsto
+\bigl(\widehat{p} \colon \Theta_0 \cdot I \rightsquigarrow S\bigr),
+\]
+with the following properties.
+\begin{enumerate}
+\item $\Jc$ is injective on objects, and restricts to a bijection between the
+objects of $\StatMod$ and those arrows of $\Stoch$ whose domain \emph{is} a
+copower $A \cdot I$ of the monoidal unit; consequently $\Jc$ is essentially
+surjective onto $\Arrcop{\Stoch}$, whose objects are the arrows with domain
+merely isomorphic to such a copower (Definition~\ref{def:arrdet}).
+\item $\Jc$ is bijective on hom-sets: for objects $x = (\Theta_0,S,p)$ and
+$x' = (\Theta_0',S',p')$, the map $\StatMod(x,x') \to \Arrdet{\Stoch}(\Jc x,\Jc x')$
+induced by $\Jc$ is a bijection provided
+\begin{enumerate}
+\item[(a)] every countably additive $\{0,1\}$-valued measure on
+$(\Theta_0',\,2^{\Theta_0'})$ is a Dirac measure, automatic when
+$|\Theta_0'|$ is smaller than the first measurable cardinal
+(Lemma~\ref{lem:app-ulam}), hence always in the finite and countable cases;
+and
+\item[(b)] for a measurable space $Z$: $\Sigma_{Z}$ is countably generated and
+separates points, so that for every $W$ the deterministic morphisms
+$W \rightsquigarrow Z$ are exactly the Dirac kernels of measurable
+maps~\cite[Ex.~10.4]{fritz_synthetic_2020}. We refer to this as ``(b) for
+$Z$''; what is required here is (b) for $S'$.
+\end{enumerate}
+\item Let $\StatMod_{(a),(b)} \subseteq \StatMod$ be the full subcategory on
+the objects $(\Theta_0,S,p)$ with $\Theta_0$ satisfying~(a) and $S$
+satisfying~(b). Then $\Jc$ restricts to an equivalence between
+$\StatMod_{(a),(b)}$ and the full subcategory of $\Arrcop{\Stoch}$ on the
+arrows $X \rightsquigarrow S$ with $S$ satisfying~(b) and $X \cong A\cdot I$
+for $A$ satisfying~(a). When all data are finite, write
+$\StatMod_{\mathrm{fin}}$ for the full subcategory on finite $\Theta_0$ and
+finite discrete $S$, (a) and~(b) are automatic, every object of
+$\FinStoch$ is a copower of $I$, and
+$\StatMod_{\mathrm{fin}} \simeq \Arrdet{\FinStoch}$ unconditionally.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Proof idea]
+With $A \cdot I \coloneqq (A, 2^{A})$, transposition~\eqref{eq:copower} gives
+the object bijection of part~(1); passing to
+$\Arrcop{\Stoch}$ requires knowing that an isomorphism
+$A \cdot I \cong X$ of $\Stoch$ is deterministic, which is proved from the
+copower side, where singletons are measurable. On morphisms,
+$(r,f) \mapsto (\del r, \del f)$, the square commuting by
+Lemma~\ref{lem:square-pointwise}; hypotheses~(a) and~(b) are exactly what is
+needed to run that lemma backwards, turning the two deterministic legs of a
+square into a function and a measurable map. The complete proof, together
+with the facts about deterministic morphisms and $\{0,1\}$-valued measures it
+relies on, is given in Appendix~\ref{app:copower}.
+\end{proof}
+
+The finite case is routine. The appeal to Ulam's theorem in~(a) should be
+carried as an
+explicit set-theoretic hypothesis, or avoided by restricting parameter objects
+to standard Borel spaces throughout, which incurs no statistical cost.
+
+\begin{remark}[Why the legs are deterministic]\label{rem:whydet}
+Definition~\ref{def:arrdet} is not the most obvious choice. Write
+$\Stoch^{\rightarrow}$ for the full arrow category, whose morphisms
+$q \to q'$ are \emph{arbitrary} pairs of kernels $(a,b)$ with
+$q' \circ a = b \circ q$; this is the definition one writes down first, and
+$\Arrdet{\Stoch}$ is a wide, non-full subcategory of it. Three points on why
+the restriction is imposed here.
+
+\emph{(i) It is an image condition, inherited from the domain.} The morphisms
+of $\StatMod$ are pairs of functions, and those of its measurable analogue
+$\Statk$, introduced in Remark~\ref{cav:Bscope}(ii), pairs of measurable
+maps, and transposition carries both to pairs of Dirac kernels. The image
+of $\Jc$ therefore lies in $\Arrim{\Stoch}$, which coincides with
+$\Arrdet{\Stoch}$ under the conditions recorded in
+Remark~\ref{rem:arrim}, hypothesis~(b) of Proposition~\ref{wprop:copower}
+among them; this is the precise sense in which the legs of
+Definition~\ref{def:arrdet} are the transposed maps. Admitting arbitrary
+pairs would make $\Jc$
+non-full for trivial reasons and leave part~(2) of that proposition without
+content. More structurally: Br\o ns' category is a comma category over a base
+equipped with a probability functor, and the legs of its squares are morphisms
+of that base; determinism is what survives of the base under transposition.
+
+\emph{(ii) Two mechanisms are lost.} The pointwise form of the commutation
+condition (Lemma~\ref{lem:square-pointwise}) rests on~\eqref{eq:push}
+and~\eqref{eq:pull}, hence on the legs being Dirac; for stochastic legs there is no corresponding
+condition in $\Meas$, and with it goes the fact that a diagram of
+deterministic morphisms commutes in $\Stoch$ if and only if the underlying
+diagram commutes in $\Meas$ (\S\ref{sec:markov}, fact~$(\mathrm{ii})$), the
+mechanism by which $\Arrdet{\Stoch}$ is a faithful shadow of the
+$\Meas$-level picture. Second, strict Kleisli equality, which is the right
+condition for deterministic legs, is not obviously the right one once the legs
+randomise: the ambient notion of equality in categorical probability is
+almost-sure equality relative to a state~\cite[\S13]{fritz_synthetic_2020}, and
+adopting it would make $\Stoch^{\rightarrow}$ a bicategory and any
+identification a biequivalence. Neither obstacle is fatal, and both lie outside what is needed here.
+
+\emph{(iii) The stochastic variant is a different subject, namely Le Cam's.}
+Discussing~\cite{mccullagh_what_2002}, Huber recalls that handling sufficiency
+forced Le Cam to replace pointwise maps by randomised maps, and that the
+analysis of variance forced randomisation of the parameter spaces as well, so
+that morphisms of experiments became equivalence classes of pairs of
+transition functions~\cite{huber_discussion_2002}. His example separates the
+two categories. Let $A$ be the experiment observing
+$X = (X_1,\dots,X_n)$, $n \ge 2$, i.i.d.\ $\Norm(\mu,\sigma^{2})$, and $B$
+the experiment observing independent $(U,V)$ with
+$U \sim \Norm(\mu,\sigma^{2}/n)$ and $V/\sigma^{2} \sim \chi^{2}_{n-1}$: two
+models with parameter set $\R \times \R_{>0}$, on $\R^{n}$ and on
+$\R \times \R_{>0}$ respectively. The statistic $t = (\bar X, S^{2})$,
+$S^{2} = \sum_i (X_i - \bar X)^{2}$, pushes each $P_A(\mu,\sigma^{2})$ to
+$P_B(\mu,\sigma^{2})$, so $(\id, \del t)$ is a morphism $A \to B$ in
+$\Arrdet{\Stoch}$. There is no morphism $B \to A$ in $\Arrdet{\Stoch}$,
+whatever its parameter leg: if $g \colon \R \times \R_{>0} \to \R^{n}$ were
+measurable with $g_{*}P_B(\theta) = P_A(a(\theta))$ for all $\theta$, the
+direction $(g - \bar g\,(1,\dots,1))/S_g$ of the sample $g(U,V)$ would be
+a statistic of $B$ whose law, uniform on the unit sphere of the hyperplane
+$\sum_i x_i = 0$, is free of $\theta$; by Basu's
+theorem~\cite{basu_statistics_1955} it would be independent of the complete
+sufficient statistic $(U,V)$, of which it is a function, hence almost surely
+constant, which it is not. In $\Stoch^{\rightarrow}$, by contrast, the
+conditional distribution $k$ of $X$ given $(\bar X, S^{2})$, free of the
+parameter, gives a morphism $(\id, k) \colon B \to A$, with
+$t \circ k = \id_B$ but $k \circ t \neq \id_A$: $k \circ t$ sends
+$x$ to the uniform distribution on the sphere through $x$. The two become
+mutually inverse only after identifying morphisms that agree once composed
+with the model, $k \circ t \circ p_A = p_A$, Huber's ``suitably defined
+equivalence classes''. Allowing stochastic legs
+thus coarsens the isomorphism relation on objects to Blackwell equivalence:
+two models $p, p' \colon \Theta \rightsquigarrow \cdot$ on the same parameter
+set are \emph{Blackwell equivalent} when each is a garbling of the other,
+$p' = c \circ p$ and $p = c' \circ p'$ for kernels $c, c'$, Blackwell's
+``equally informative''~\cite{blackwell_equivalent_1953}, deficiency zero in
+Le Cam's theory~\cite{lecam_sufficiency_1964}, and mutual dominance for the
+informativeness preorder of~\cite[\S5.1]{fritz_representable_2023}. In the
+quotient just described, a morphism $B \to A$ over $\id_\Theta$ with an
+inverse is exactly such a pair of garblings, so isomorphism there is
+Blackwell equivalence, and the invariant under study becomes informativeness
+rather than meaningfulness. That is the wrong invariant for the present purpose:
+Definition~\ref{def:meaningful} asserts that reducing a design or
+reparametrising introduces no randomness, and a category whose reductions may
+themselves randomise cannot state it. The two readings of McCullagh's question,
+which models are meaningful, and which experiments are equivalent, are
+genuinely different questions, and this paper is committed to the first.
+\end{remark}
+
+\begin{caveat}[What this settles, and what it does not]\label{cav:Bscope}
+Three points, in increasing order of consequence.
+
+\emph{(i) The essential image is not everything.} $\StatMod$ is \emph{not}
+equivalent to $\Arrdet{\Stoch}$: the image is the full subcategory on arrows
+out of copowers of $I$. Any statement of the form ``Br\o ns' category
+is the category whose objects are the morphisms of $\Stoch$'' is therefore
+false as stated and must carry the domain restriction. The restriction is
+invisible in the finite case only because there every object of $\FinStoch$ is
+a copower of $I$.
+
+\emph{(ii) The restriction is an artefact of the $\Set$-valued formulation.}
+Replace Br\o ns' $\StatMod = (\id_{\Set}\downarrow\Prb)$ by its measurable
+analogue $\Statk \coloneqq (\id_{\Meas}\downarrow\G)$, whose objects are
+measurable maps $\Theta \to \G S$. By~\eqref{eq:kleisli} these are exactly the
+morphisms $\Theta \rightsquigarrow S$ of $\Stoch$, with no copower condition,
+and the same argument gives a functor
+$\Jcm \colon \Statk \to \Arrdet{\Stoch}$
+(Definition~\ref{def:arrdet}, whose objects are arbitrary, not
+deterministic, morphisms of $\Stoch$). The two levels behave differently
+and it is worth separating them.
+
+On objects, the identification is a tautology, by~\eqref{eq:kleisli}: the
+copower restriction disappears because every measurable space, and not only a
+discrete one, is now admissible as a parameter object.
+
+On morphisms it is not a tautology. Transposition sends a morphism $(u,h)$ of $\Statk$, a pair of
+\emph{measurable} maps, to the square $(\del u, \del h)$, and this
+assignment is unconditionally bijective on objects and full onto
+$\Arrim{\Stoch}$. It is \emph{faithful} exactly when $\del$ is injective on
+the measurable maps concerned, that is when $\Sigma_{\Theta'}$ and
+$\Sigma_{S'}$ separate points; and $\Arrim{\Stoch} = \Arrdet{\Stoch}$ exactly
+when every deterministic morphism into $\Theta'$ or into $S'$ is a Dirac
+kernel (Remark~\ref{rem:arrim}), which is the remaining content of~(b). Both
+requirements concern
+\emph{both} legs, whereas Proposition~\ref{wprop:copower} invokes (b) for $S'$
+alone, hypothesis~(a) doing the parameter-side work there, at the price of
+the copower restriction. The correct statement is therefore: $\Jcm$
+restricts to an equivalence between the full subcategory of $\Statk$ on the
+objects whose parameter space and sample space both satisfy~(b) and the full
+subcategory of $\Arrdet{\Stoch}$ on the arrows between such spaces;
+unconditionally one has only a bijective-on-objects full functor
+$\Statk \to \Arrim{\Stoch}$.
+
+Hypothesis~(a) does not survive this passage, but neither does it drop
+out: it served to recognise a deterministic morphism out of a \emph{discrete}
+parameter object as a Dirac measure, and in the measurable setting that task
+is taken over by (b) for $\Theta'$. The two are in fact instances of a single
+requirement, the one isolated in Definition~\ref{def:dirac}: that the
+$\{0,1\}$-valued measures on the codomain be exactly its points. Condition~(b)
+secures it when the $\sigma$-algebra is countably generated and separating.
+Condition~(a) is what remains of it over a discrete parameter object
+$(\Theta_{0}', 2^{\Theta_{0}'})$, whose $\sigma$-algebra separates points but
+is not countably generated unless $\Theta_{0}'$ is countable, so that the
+identification of $\{0,1\}$-valued measures with points degenerates into a
+set-theoretic question about measurable cardinals rather than a
+measure-theoretic one. Passing to $\Statk$ therefore does not remove a
+hypothesis: it replaces the set-theoretic instance by the measure-theoretic
+one, and is repaid by the disappearance of the copower restriction. No copower
+intervenes on either side. Nor
+does any strengthening of the hypotheses give an equivalence with the full
+arrow category $\Stoch^{\rightarrow}$: the morphisms of a comma category over
+$\Meas$ are pairs of measurable maps, so their transposes are deterministic by
+construction, and the genuinely stochastic squares are never in the image
+(Remark~\ref{rem:whydet}).
+
+So the unrestricted identification is correct \emph{for the measurable comma
+category} on the full subcategory of objects satisfying~(b) on both legs, and
+incorrect for the $\Set$-valued one, where it acquires a domain restriction.
+The
+mathematical content of the identification is thus not the equivalence itself but the
+comparison functor $\StatMod \to \Statk$, which is precisely the
+measurability gap of Remark~\ref{rem:hypotheses}, met from the other side.
+That functor is constructed in Proposition~\ref{prop:coreflection} below. It
+exists unconditionally, is fully faithful, and fails to be essentially
+surjective exactly at the non-discrete parameter objects; so the copower
+restriction of~(i) is the non-invertibility of a
+counit, and it is invisible in the finite case for that reason.
+
+\emph{(iii) This is a statement about $\StatMod$, not about models.} A
+McCullagh--Br\o ns model is a diagram
+$\widehat{P} \colon \catV\times\catD^{\op} \to \StatMod$
+(Proposition~\ref{prop:brons}), and the parameter object at $\omega$ supplied
+by Theorem~\ref{thm:bridge-finite} is $\del\Theta_\Meas(\omega)$, a copower of
+$I$ exactly when $\Theta_\Meas(\omega)$ is discrete. The two identifications
+therefore agree in the finite case and diverge in general.
+Corollary~\ref{cor:coreflection-diagrams} says how far the diagram-level
+statement can be pushed, and Proposition~\ref{wprop:copower} should not be
+presented as going further than that.
+\end{caveat}
+
+The comparison functor of~(ii) can be written down, and doing so settles more
+than the passage between the two formulations. Write
+$D \colon \Set \to \Meas$ for the functor equipping a set with its power-set
+$\sigma$-algebra and $U \colon \Meas \to \Set$ for the underlying-set functor.
+
+\begin{proposition}[Discretisation of the parameter;
+$\StatMod$ as a coreflective subcategory of $\Statk$]\label{prop:coreflection}
+$D \dashv U$, and $U\G = \Prb$ by construction. Write
+$\varepsilon \colon DU \Rightarrow \id_{\Meas}$ for the counit, the
+component $\varepsilon_X$ is the identity function on $UX$, measurable because
+its domain is discrete, and put
+$\lambda \coloneqq \varepsilon\G \colon D\Prb \Rightarrow \G$. Then:
+\begin{enumerate}
+\item
+$\Phi \colon \StatMod \to \Statk$,
+$\;(\Theta_0, S, p) \mapsto (D\Theta_0,\, S,\, \lambda_S \circ Dp)$,
+$\;(u,h) \mapsto (Du, h)$,
+is a functor; its structure map is $p$ itself, read as a measurable map on a
+discrete domain.
+\item
+$\Psi \colon \Statk \to \StatMod$,
+$\;(\Theta, S, q) \mapsto (U\Theta,\, S,\, Uq)$,
+$\;(a,h) \mapsto (Ua, h)$,
+is a functor, and $\Phi \dashv \Psi$.
+\item $\Psi\Phi = \id_{\StatMod}$. Hence the unit is an identity,
+$\Phi$ is fully faithful, and $\StatMod$ is a coreflective subcategory of
+$\Statk$ with coreflector $\Psi$.
+\item The counit of $\Phi \dashv \Psi$ at $(\Theta, S, q)$ is
+$(\varepsilon_{\Theta}, \id_S)$, invertible if and only if
+$\Sigma_{\Theta} = 2^{\Theta}$. The essential image of $\Phi$ is the full
+subcategory of $\Statk$ on the objects whose parameter space is discrete.
+\end{enumerate}
+None of this uses hypothesis~(a) or~(b) of Proposition~\ref{wprop:copower}, or
+any set-theoretic assumption.
+\end{proposition}
+
+\begin{proof}
+$D \dashv U$ because every function out of a discrete space is measurable, so
+$\Meas(DA, X) = \Set(A, UX)$ naturally; $U\G = \Prb$ because the underlying
+set of $\G S$ is $\Prb(S)$ and the underlying function of $\G(h)$ is
+pushforward. As a whiskering of $\varepsilon$, $\lambda$ is natural, and each
+$\lambda_S$ is the identity on underlying sets.
+
+(1) $Dp \colon D\Theta_0 \to D\Prb(S)$ is measurable (both spaces discrete)
+and $\lambda_S$ is measurable, so $\lambda_S \circ Dp$ is an object of
+$\Statk$. For a morphism $(u,h)$, using naturality of $\lambda$, functoriality
+of $D$, and the $\StatMod$ square $\Prb(h)\circ p = p' \circ u$,
+\[
+\G(h) \circ \lambda_S \circ Dp
+= \lambda_{S'} \circ D\bigl(\Prb(h)\bigr) \circ Dp
+= \lambda_{S'} \circ D\bigl(p' \circ u\bigr)
+= \bigl(\lambda_{S'} \circ Dp'\bigr) \circ Du ,
+\]
+which is the $\Statk$ square. Identities and composites are preserved
+componentwise.
+
+(2) $\Psi$ is well defined since $Uq \colon U\Theta \to U\G S = \Prb(S)$. For
+the adjunction, a morphism
+$\Phi(\Theta_0,S,p) \to (\Theta',T,q)$ is a pair $(a,h)$ with $a \colon
+D\Theta_0 \to \Theta'$ measurable and $q \circ a = \G(h) \circ \lambda_S \circ
+Dp$. Transposing $a$ across $D \dashv U$ gives $u = Ua \colon \Theta_0 \to
+U\Theta'$, and since both sides of the square are measurable maps out of the
+discrete space $D\Theta_0$ and $U$ is faithful, the square is equivalent to
+its image under $U$, namely $Uq \circ u = \Prb(h) \circ p$, the $\StatMod$
+square for $(u,h) \colon (\Theta_0,S,p) \to \Psi(\Theta',T,q)$. The
+correspondence is bijective, and natural in both variables because on the
+parameter leg it is the $D \dashv U$ bijection and on the sample leg it is the
+identity.
+
+(3) $UD = \id_{\Set}$ and $U\lambda_S = \id$, so $\Psi\Phi$ is the identity on
+objects and on morphisms. A left adjoint whose unit is invertible is fully
+faithful, and its domain is then coreflective in its codomain.
+
+(4) $\Phi\Psi(\Theta,S,q) = (DU\Theta,\, S,\, \lambda_S \circ D(Uq))$, and
+$(\varepsilon_\Theta, \id_S)$ is a morphism from it to $(\Theta,S,q)$: both
+legs of the required square are measurable maps $DU\Theta \to \G S$ with
+underlying function $Uq$, and $U$ is faithful. It is the counit by the triangle
+identities. Since $\varepsilon_\Theta$ is a bijection, it is an isomorphism in
+$\Meas$ exactly when $\Sigma_\Theta$ is the full power set; and
+$X \cong DA$ in $\Meas$ forces $\Sigma_X = 2^X$, which gives the description of
+the essential image. Fullness of that subcategory is automatic from~(3).
+\end{proof}
+
+The point of~(4) is that the domain restriction which had to be carried
+through Proposition~\ref{wprop:copower} by hand is a single counit, and one
+whose failure to be invertible is exactly non-discreteness of the parameter.
+Transporting to diagrams is then formal.
+
+\begin{corollary}[Diagram-level form]\label{cor:coreflection-diagrams}
+Let $\cat{C}$ be a small category. Post-composition with $\Phi$ and $\Psi$
+gives functors $\Phi_{*}, \Psi_{*}$ between the diagram categories
+$[\cat{C}, \StatMod]$ and $[\cat{C}, \Statk]$ with $\Phi_{*} \dashv \Psi_{*}$
+and $\Psi_{*}\Phi_{*} = \id$. Consequently, taking
+$\cat{C} = \catV \times \catD^{\op}$:
+\begin{enumerate}
+\item Br\o ns' bijection (Proposition~\ref{prop:brons}) transports along
+$\Phi_{*}$ to a bijection between McCullagh--Br\o ns models and those functors
+$\catV \times \catD^{\op} \to \Statk$ whose two projections are
+$D \circ U_\catK\Theta\,\pr_\catO^{\op}\pr_2$ and
+$\Gamma(\id \times \pr_\catU^{\op})$; the projection part of
+Proposition~\ref{prop:brons} is thus replaced by its discretisation on the
+parameter leg.
+\item A diagram in $\Statk$ lies in the essential image of $\Phi_{*}$ if and
+only if it is pointwise discrete on the parameter side, the obstruction at
+each index being the counit component of
+Proposition~\ref{prop:coreflection}(4).
+\end{enumerate}
+In particular, the diagram-level identification holds up to a coreflection, and
+pointwise discreteness of the parameter object is not a technical convenience
+but exactly its boundary.
+\end{corollary}
+
+\begin{proof}
+Post-composition with an adjunction is an adjunction between diagram
+categories, with unit and counit computed pointwise, and
+$\Psi_{*}\Phi_{*} = (\Psi\Phi)_{*} = \id$. (1) A functor
+$F \colon \catV \times \catD^{\op} \to \Statk$ with the stated projections has
+parameter legs of the form $D\Theta_0$, so $F = \Phi_{*}\Psi_{*}F$ (both sides have the same underlying functions, and a map out of a discrete
+space is measurable); hence $F \mapsto \Psi_{*}F$ and $G \mapsto \Phi_{*}G$
+are mutually inverse between such functors and the functors
+$\catV \times \catD^{\op} \to \StatMod$ with projections
+$U_\catK\Theta\,\pr_\catO^{\op}\pr_2$ and $\Gamma(\id \times \pr_\catU^{\op})$,
+and Proposition~\ref{prop:brons} identifies the latter with models.
+(2) If $F$ is pointwise discrete on the parameter side, each counit component
+$(\varepsilon_{\Theta_c},\id)$ is invertible by
+Proposition~\ref{prop:coreflection}(4), so $\Phi_{*}\Psi_{*}F \Rightarrow F$
+is a natural isomorphism and $F$ lies in the essential image; conversely
+$\Phi_{*}G$ is pointwise discrete by construction, and pointwise discreteness
+is invariant under isomorphism in $[\cat{C},\Statk]$, since $X \cong DA$ in
+$\Meas$ forces $\Sigma_X = 2^{X}$.
+\end{proof}
+
+Two consequences for how the open problem should now be stated. First, the
+object-level identification of Proposition~\ref{wprop:copower} and the
+diagram-level statement are not competing formulations to choose between: they
+are the restriction and the transport of one adjunction, and the question of
+which is ``correct'' does not arise. Second, the passage from $\StatMod$ to
+$\Arrdet{\Stoch}$ factors as $\Jc \cong \Jcm\Phi$, the isomorphism being
+the canonical identification $D\Theta_0 \cong \Theta_0 \cdot I$ in $\Stoch$,
+and the two factors behave quite differently. The first,
+$\Phi \colon \StatMod \to \Statk$, is unconditional. Every hypothesis in
+Proposition~\ref{wprop:copower}, the measurable-cardinal condition~(a) and
+the countably-generated condition~(b), is used only on the second,
+$\Jcm \colon \Statk \to \Arrdet{\Stoch}$. What remains open is
+therefore confined to $\Jcm$.
+
+Whether Br\o ns' equivalence (Proposition~\ref{prop:brons}), transported as in
+Corollary~\ref{cor:coreflection-diagrams}, continues to hold with
+$\Arrdet{\Stoch}$ in place of $\Statk$, and under which hypotheses
+$\Jcm$, hence the composite $\Jc \cong \Jcm\Phi$ onto
+$\Arrcop{\Stoch}$, is an equivalence, is left open here.
+
+\section{Meaningfulness as naturality}\label{sec:meaningful}
+
+Two criteria are on the table, and it is worth keeping them apart before
+merging them. Tjur's discussion~\cite{tjur_discussion_2002}
+of~\cite{mccullagh_what_2002} proposes an elementary one: a
+parameter function, a rule assigning to each finite sample of covariate
+values a parameter of the corresponding model, in his words a ``function of
+the unknown distribution''~\cite[p.~1299]{tjur_discussion_2002}, is
+\emph{meaningful} when it is invariant under the formation of marginal
+models, that is, when reducing the design by removing some of the sampled
+$x$'s leaves the associated parameter unchanged. The removal deletes sample
+points together with their covariate values, not points of a covariate
+space; Lemma~\ref{lem:tjurshadow} identifies its action on the quantities
+below with naturality over the insertions. McCullagh's own
+criterion~\cite[\S4.5]{mccullagh_what_2002} is that a subparameter be a natural
+transformation of functors on the design category.\footnote{\label{fn:indexings}The two indexings
+agree on the families compared here, so the comparison below is over a single
+class of morphisms. Designs index McCullagh's components in \S4.5 and
+natural over all design morphisms $(\psi_{d},\psi_{c})$, whereas
+Definition~\ref{def:meaningful} indexes quantities by objects of $\catO$ and
+quantifies over its morphisms; on families factoring through $\pr_{\catO}$ the
+squares with identity covariate leg are trivial, and the remaining ones are
+exactly the morphisms of $\catO$, since for
+any $\psi \colon \omega \to \omega'$ and any design $(u,\omega,x)$ the pair
+$(\id_{u},\psi) \colon (u,\omega,x) \to (u,\omega',\psi\circ x)$ is a morphism
+of $\catD$, so that $\pr_{\catO}$ is surjective on morphisms.} Tjur quantifies over
+removal of sample points, acting, by Lemma~\ref{lem:tjurshadow}, through
+the insertions alone; McCullagh over all design morphisms. Neither source
+asserts that the two coincide as mathematical requirements, and in general they
+do not, but how far they
+differ depends on a convention, and it is worth being explicit about whose.
+McCullagh takes the morphisms of $\catO$ to be
+injective~\cite[\S4.1]{mccullagh_what_2002}, so under his own convention
+merging is not a morphism at all, and the gap between his criterion and Tjur's
+consists exactly of the bijections—that is, of relabelling.
+Definition~\ref{def:designdata} follows Br\o ns in imposing no such
+restriction, and every map of covariate spaces factors as a surjection
+followed by an injection; so in the setting of this paper the three quantifier
+classes are nested strictly,
+\[
+\underbrace{\text{insertions}}_{\text{Tjur}}
+\;\subsetneq\;
+\underbrace{\text{all injections (insertions and bijections)}}_{\text{McCullagh as stated}}
+\;\subsetneq\;
+\underbrace{\text{all of } \catO}_{\text{naturality here}},
+\]
+and the corresponding conditions are ordered the other way, naturality over
+all of $\catO$ being the strongest. The outer step is merging; the inner step
+is relabelling. Here and throughout, the \emph{insertions} are the proper
+inclusions $\omega' \subsetneq \omega$ between objects of $\catO$, the
+covariate legs of Tjur's reductions, as fixed in Example~\ref{ex:oneway-setup},
+and $\catO_{\mathrm{red}} \subseteq \catO$ denotes the subcategory they
+generate, whose morphisms are the inclusions (proper or identity). Insertions
+carry the surviving labels unchanged; an injection that is not an inclusion
+is a relabelling followed by an insertion, and naturality along it is not
+part of Tjur's condition. What the bridge buys is that all three
+conditions become
+computations in the same ambient category so that the gap can be measured rather
+than elided, and, as \S\ref{sec:hochschild} shows for the one-way layout, it
+is the reduction morphisms that carry the defect in the motivating example, so
+that Tjur's weaker criterion already suffices to detect it there.
+
+Throughout we take \emph{meaningfulness} in the strong (naturality) sense, and
+record where the weaker Tjur condition would do. We fix the definition in the
+bridged setting.
+
+The value space of a quantity may itself depend on the design, and a change of
+design then transports values: in the one-way layout
+(Example~\ref{ex:oneway-setup}, $\omega$ a finite label set) the vector of
+group means at $\omega'$ is a point of $\R^{\omega'}$, carried along
+$\psi \colon \omega \to \omega'$ to $\R^{\omega}$ by the restriction
+$\psi^{*}$; in the regression example (Example~\ref{ex:linreg}) the
+coefficient vector at $\omega'$ is a point of $\omega'^{*}$, carried to
+$\omega^{*}$ by the transpose of $\psi$. The target of a design-indexed
+quantity is accordingly a functor $\Lambda \colon \catO^{\op} \to \Meas$, of
+the same variance as $\Theta_\Meas$, so that the squares below compose. A
+constant $\Lambda$ recovers the familiar fixed-scale case
+(Example~\ref{ex:alphabetaxbar} and the whole of \S\ref{sec:hochschild});
+Example~\ref{ex:tjurgap} has a genuinely varying target.
+
+\begin{definition}[Design-indexed quantity; meaningfulness]\label{def:meaningful}
+Let $\mathbf{P} \colon \mathbf{L} \Rightarrow \mathbf{R}$ be a bridged model
+(Theorem~\ref{thm:bridge-meas}). Let
+$\Lambda \colon \catO^{\op} \to \Meas$ be a functor, the \emph{target}:
+$\Lambda(\omega)$ is the measurable space of values at design $\omega$. A
+\emph{design-indexed quantity} for $\mathbf P$ with target
+$\Lambda$ is a family of morphisms in $\Stoch$
+\[
+g_{\omega} \colon \Theta_\Meas(\omega) \rightsquigarrow \Lambda(\omega),
+\qquad \omega \in \ob\catO
+\]
+(the deterministic case is when $g$ is an ordinary parameter functional). The
+quantity is \emph{meaningful} if $g$ is a natural transformation
+$\del\,\Theta_\Meas \Rightarrow \del\,\Lambda$ (deterministic case) or
+$\Theta_\Meas \Rightarrow \Lambda$ read in $\Stoch$ (kernel case): i.e.\ for
+every $\psi \colon \omega \to \omega'$ in $\catO$,
+\begin{equation}\label{eq:tjursquare}
+g_{\omega} \circ \del\Theta_\Meas(\psi) \;=\; \del\Lambda(\psi) \circ
+g_{\omega'}
+\quad\text{in } \Stoch .
+\end{equation}
+\end{definition}
+
+A design-indexed quantity $g$ is \emph{Tjur-natural} when~\eqref{eq:tjursquare}
+holds for every $\psi$ of $\catO_{\mathrm{red}}$, the subcategory of
+inclusions generated by the insertion morphisms as fixed at the opening of
+this section; Lemma~\ref{lem:tjurshadow}
+warrants the name: the formation of marginal models is removal of sample
+points, and on quantities indexed over $\catO$ it acts through the
+insertions and through nothing else.
+
+\medskip
+\noindent\textbf{Tjur reductions.} Fix design data in $\Set$ as in
+Example~\ref{ex:oneway-setup}, with $\catO$ a category of finite sets such as
+$\catO_{\mathrm{lab}}$: $\cat{C} = \Set$, both $J$'s the evident
+underlying-set functors, and
+$\catU$ a full subcategory of $\FinSet_{\mathrm{inj}}$ containing the
+underlying sets of the objects of $\catO$ (so that every subsample inclusion
+between such sets is a morphism of $\catU$). The regression instantiations
+of \S\ref{sec:worked}, whose covariate objects are vector spaces, fall
+outside this setting. A \emph{Tjur reduction} of a design
+$(u,\omega,x)$ with $x$ surjective is a morphism of $\catD$
+\[
+(\varphi,\psi) \colon (u',\omega',x') \longrightarrow (u,\omega,x)
+\]
+in which $\varphi \colon u' \hookrightarrow u$ is a proper subsample
+inclusion, $\omega' = x(\varphi(u'))$ the surviving support, $x'$ the
+corestriction of $x \circ \varphi$, and
+$\psi \colon \omega' \hookrightarrow \omega$ the inclusion: the removal of
+the sample points $u \setminus \varphi(u')$ together with the covariate
+values no longer observed, Tjur's ``removal of some of the
+$x$'s''~\cite[p.~1299]{tjur_discussion_2002}. His condition at such a
+reduction compares the parameter assigned to the marginal model with the
+parameter for the bigger sample, the former being for him a function of the
+marginal distribution. Since a bridged model is natural at $(\varphi,\psi)$,
+this is square~\eqref{eq:ND}, the marginal law at the reduced design
+depends on $\theta$ only through $\Theta_\Meas(\psi)\theta$; the comparison
+is therefore square~\eqref{eq:tjursquare} at $\psi$, and we say $g$
+\emph{satisfies Tjur's condition} at the reduction when that square
+commutes.
+
+\begin{lemma}[Tjur reductions act through their covariate
+shadows]\label{lem:tjurshadow}
+In the setting above, a design-indexed quantity $g$ satisfies Tjur's
+condition at every Tjur reduction of every design with a surjective design map
+if and only if $g$ is Tjur-natural.
+\end{lemma}
+
+\begin{proof}
+If $g$ is Tjur-natural: the covariate leg $\psi$ of a Tjur reduction is the
+inclusion of the surviving support, hence an insertion (a proper inclusion)
+when the removal empties some fibre of $x$ and the identity otherwise;
+square~\eqref{eq:tjursquare} holds at the former by hypothesis and at the
+latter trivially. Conversely, it suffices to check~\eqref{eq:tjursquare} at
+each insertion $\psi \colon \omega' \subsetneq \omega$, since such squares
+paste along composites and hold trivially at identities. Consider the
+tautological design $(\omega,\omega,\id_\omega)$, one unit per treatment
+label, with surjective design map, and the subsample
+$\varphi = \psi \colon \omega' \hookrightarrow \omega$, a morphism of $\catU$
+because $\omega'$ and $\omega$ are objects of $\catO$, hence of $\catU$, and
+$\catU$ is full in $\FinSet_{\mathrm{inj}}$. The surviving support is
+$x(\varphi(\omega')) = \omega'$, so
+$(\psi,\psi) \colon (\omega',\omega',\id) \to (\omega,\omega,\id)$ is a Tjur
+reduction with covariate leg $\psi$, and Tjur's condition at it is
+square~\eqref{eq:tjursquare} at $\psi$.
+\end{proof}
+
+\begin{remark}[What the indexing screens off]\label{rem:tjurscope}
+We plainly state two limitations of the Lemma. First, the same
+removal recorded without corestriction, as
+$(\varphi,\id_\omega) \colon (u',\omega,x\circ\varphi) \to (u,\omega,x)$, has
+identity covariate leg, and for quantities indexed over $\catO$ every such
+square is trivial (footnote~\ref{fn:indexings}); the force of Tjur's
+criterion is carried entirely by the corestriction, that is, by his own
+requirement that the parameter of the marginal model be a function of the
+marginal distribution, which, for the models of \S\ref{sec:worked}, the
+surviving support parametrises. Second, Tjur's parameter functions are
+indexed by samples, and before his criterion is imposed they include the
+sample size $n$ and the average $\bar x$ weighted by
+multiplicities~\cite[p.~1299]{tjur_discussion_2002}; quantities in the sense
+of Definition~\ref{def:meaningful} are indexed by $\catO$ and can express
+neither, replication-dependence is screened off by the indexing rather
+than eliminated by the criterion, and its model-side trace is the
+$\catU$-slot failure of Example~\ref{ex:centring}. What the criterion
+adjudicates on $\catO$-indexed quantities is dependence on the observed
+covariate values, and there, by the Lemma, sample-level invariance and
+naturality over $\catO_{\mathrm{red}}$ coincide.
+\end{remark}
+
+\begin{proposition}[Meaningfulness is naturality; comparison with Tjur's
+criterion; type-level reading]\label{prop:tjur}
+Let $g$ be a design-indexed quantity. Then:
+\begin{enumerate}
+\item if $g$ is deterministic in the sense $g_\omega = \del f_\omega$ for
+measurable $f_\omega \colon \Theta_\Meas(\omega) \to \Lambda(\omega)$ (an
+ordinary parameter functional), and the $\sigma$-algebras of the
+$\Lambda(\omega)$ separate points, then $g$ is meaningful iff the $f_\omega$
+form a natural transformation $\Theta_\Meas \Rightarrow \Lambda$ in $\Meas$;
+\item[(1$'$)] meaningfulness implies Tjur-naturality; the converse holds when
+$\catO_{\mathrm{red}} = \catO$, and fails in general
+(Example~\ref{ex:tjurgap});
+\item meaningfulness is stable under postcomposition with natural
+transformations of targets $\Lambda \Rightarrow \Lambda'$ (in $\Meas$, or in
+$\Stoch$ for kernel quantities) and under pullback along functors
+$F \colon \catO' \to \catO$ (change of covariate scheme; the bridged model
+$\mathbf{P}$ is restricted along $F$ as well);
+\item in the functor category
+$\Stoch^{\,\catO^{\op}}$ (objects: functors; morphisms: natural
+transformations), $g$ is meaningful iff it \emph{is} a morphism
+$\del\Theta_\Meas \to \del\Lambda$ (deterministic case) or
+$\Theta_\Meas \to \Lambda$ (kernel case). A non-natural family is not a
+morphism of the category, it lacks the asserted type.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) With $g = \del f$, square~\eqref{eq:tjursquare} reads
+$\del(f_\omega \circ \Theta_\Meas(\psi)) = \del(\Lambda(\psi) \circ
+f_{\omega'})$, and $\del$ is faithful on maps into the point-separating
+space $\Lambda(\omega)$ (Definition~\ref{def:dirac}), so this holds iff
+$f_\omega \circ \Theta_\Meas(\psi) = \Lambda(\psi) \circ f_{\omega'}$.
+(1$'$): the implication and the equality case are immediate, Tjur-naturality
+being~\eqref{eq:tjursquare} with the quantifier restricted to
+$\catO_{\mathrm{red}}$; Example~\ref{ex:tjurgap} supplies a quantity that is
+Tjur-natural but not meaningful (Example~\ref{ex:alphabetaxbar}, by contrast,
+fails already on $\catO_{\mathrm{red}}$ and does not separate the two
+conditions). (2) is
+functoriality of pasting. (3) is a restatement of the definition of the
+functor category.
+\end{proof}
+
+\begin{example}[Tjur's non-example: the design-averaged
+expectation]\label{ex:alphabetaxbar}
+Recast in the present notation, Tjur's own
+non-example~\cite[pp.~1299--1300]{tjur_discussion_2002} is the simple regression
+model with $\Theta(\omega) = \R^2 \times \R_{>0}$, coordinates
+$(\alpha,\beta,\sigma^2)$, $\catO$ the category of finite covariate
+selections, and $\Lambda$ constant at $\R$ (with $\Lambda(\psi) = \id$);
+this recasts the unreplicated case, the design map injective, so that
+sample points and covariate values coincide, the general case, with
+$\bar x$ weighted by multiplicities, is screened off by the
+$\catO$-indexing (Remark~\ref{rem:tjurscope}). Put
+\[
+g_{\omega}(\alpha,\beta,\sigma^2) \;=\; \alpha + \beta\,\bar x_{\omega},
+\qquad
+\bar x_{\omega} = |\omega|^{-1}\textstyle\sum_{x \in \omega} x .
+\]
+Each $g_\omega$ is a legitimate parameter of the model at $\omega$. But for
+an insertion $\psi \colon \omega \subsetneq \omega'$ the parameter map
+$\Theta(\psi)$ is the identity, while $\bar x_\omega \neq \bar x_{\omega'}$ in
+general, so~\eqref{eq:tjursquare} reads $\alpha + \beta\bar x_{\omega} = \alpha
++ \beta\bar x_{\omega'}$ and fails off the locus $\beta = 0$. The failure is
+already visible on $\catO_{\mathrm{red}}$, so the quantity is non-meaningful in
+both Tjur's sense and ours. The same argument, with $\Theta(\psi)$ again the
+identity, disqualifies the correlation coefficient, whose design dependence
+enters through the covariate
+variance~\cite[\S6.2]{mccullagh_what_2002}; here it is
+the design-\emph{scale} rather than the design-\emph{mean} that fails to
+transport. In the bridged setting both failures are equalities that fail,
+not methodological unease.
+\end{example}
+
+\begin{example}[A quantity natural on $\catO_{\mathrm{red}}$ but not on
+$\catO$]\label{ex:tjurgap}
+Let $\catO = \catO_{\mathrm{lab}}$ (Example~\ref{ex:oneway-setup}), let
+$\Theta$ be any parameter functor, and take as target
+$\Lambda(\omega) = \R^{\omega \times \omega}$ with
+$\Lambda(\psi) = (\psi\times\psi)^{*}$, i.e.\
+$\Lambda(\psi)(v)_{(a,b)} = v_{(\psi a,\,\psi b)}$. Put
+$g_\omega(\theta)_{(a,b)} = [a \neq b]$, the indicator that two treatment
+labels are distinct. Square~\eqref{eq:tjursquare} at
+$\psi \colon \omega \to \omega'$ reads $[a \neq b] = [\psi a \neq \psi b]$
+for all $a,b \in \omega$, which holds iff $\psi$ is injective. Hence $g$ is
+natural along every injection, in particular along every insertion, hence
+Tjur-natural, and natural even under McCullagh's criterion as stated (all
+injections, i.e.\ insertions and bijections), and fails along every merge, for instance
+along $p \colon \{1,2\} \to \{*\}$: the gap between Tjur-naturality and
+meaningfulness is realised at the merges.
+\end{example}
+
+\begin{corollary}[Finite verification]\label{cor:decidable}
+Suppose $\catO$ has finitely many morphisms, $\Theta_\Meas(\omega)$ and
+$\Lambda(\omega)$ are finite (discrete) for every $\omega$, and the entries of
+the kernels $g_\omega$ lie in a subfield $k \subseteq \R$ with decidable
+equality (for instance $\mathbb{Q}$, or the real algebraic numbers). Then
+meaningfulness of $g$ is decidable: it is equivalent to the finite
+conjunction, over the morphisms $\psi \colon \omega \to \omega'$ of any
+generating set of $\catO$, of the matrix equalities~\eqref{eq:tjursquare},
+each between two $|\Theta_\Meas(\omega')| \times |\Lambda(\omega)|$ stochastic
+matrices with entries in $k$.
+\end{corollary}
+
+\begin{proof}
+If~\eqref{eq:tjursquare} holds at $\psi$ and at $\psi'$ then it holds at
+$\psi'\psi$, by pasting the two squares ($\del\Theta_\Meas$ and $\del\Lambda$
+being functors), so it suffices to check a generating set, which is finite;
+each check is an equality of finitely many elements of $k$, decidable by
+hypothesis.
+\end{proof}
+
+\section{A cohomological formulation of coherence for finite
+designs}\label{sec:hochschild}
+
+This section formulates, it does not yet fully prove, the connection
+between meaningfulness and the cohomology of diagrams of algebras, which
+links the present framework to the diagrammatic
+Hochschild/\allowbreak Gerstenhaber--Schack theory
+of~\cite{gerstenhaber_schack_1983,baues_cohomology_1985}, as revisited
+in~\cite[\S3]{caputi_diagrammatic_2025}. The logical
+role of this section is precisely
+delimited: cohomology here \emph{controls obstructions} to coherence; it is
+upstream of the bridge, not a proof of it. A distinct cohomological tradition
+attaches invariants to statistical structures directly; its relation to the
+complex constructed here is set out in Remark~\ref{rem:infocohomology} at the
+end of the section.
+
+\subsection{The diagram of algebras of a finite design scheme}
+
+Let $\catO$ be a finite category of covariate schemes and let all spaces,
+the parameter sets $\Theta(\omega)$ and the target sets $\Lambda(\omega)$,
+be finite, as in Corollary~\ref{cor:decidable}. Fix a field $k \supseteq \mathbb{Q}$.
+
+\begin{definition}\label{def:diagalg}
+Write $\Alg_k$ for the category of associative unital $k$-algebras and unital
+$k$-algebra homomorphisms. The \emph{parameter diagram of algebras} is the
+functor
+\[
+A \colon \catO \longrightarrow \Alg_k,
+\qquad
+A(\omega) \coloneqq k^{\,\Theta(\omega)}
+\]
+(functions on the parameter set, a commutative $k$-algebra under pointwise
+operations), covariant because $\Theta$ is contravariant and
+$k^{(-)}$ is contravariant again: $A(\psi) = (\Theta(\psi))^{*}$ is
+precomposition. Similarly, each target functor $\Lambda$ yields
+$B(\omega) = k^{\Lambda(\omega)}$.
+\end{definition}
+
+A \emph{deterministic} design-indexed quantity $g = \{g_\omega \colon
+\Theta(\omega) \to \Lambda(\omega)\}$ dualises to a family of algebra maps
+$g^{*} = \{g_\omega^{*} \colon B(\omega) \to A(\omega)\}$, and $g$ is
+meaningful (Definition~\ref{def:meaningful}) iff $g^{*}$ is a natural
+transformation of diagrams $B \Rightarrow A$: all spaces being finite and
+discrete, meaningfulness is naturality of the underlying maps
+(Proposition~\ref{prop:tjur}(1)), and $k^{(-)}$ is faithful, a map $f$ is
+recovered from $f^{*}$ through the indicator functions of its fibres, so
+naturality of $g$ and of $g^{*}$ are equivalent. Failure of naturality is
+measured, for each $\psi \colon \omega \to \omega'$, by the difference
+\begin{equation}\label{eq:defect}
+c(\psi) \;\coloneqq\; A(\psi)\, g_{\omega}^{*} \;-\; g_{\omega'}^{*}\, B(\psi)
+\;\in\; \Hom_k\bigl(B(\omega), A(\omega')\bigr),
+\end{equation}
+a $1$-cochain on $\catO$ in the sense of
+Baues--Wirsching~\cite[(1.4)]{baues_cohomology_1985}, with coefficients in
+the natural system $D \colon F\catO \to \mathrm{Ab}$ obtained by pulling
+back the bimodule $M(\omega,\omega') = \Hom_k(B(\omega),A(\omega'))$
+along the forgetful functor
+$F\catO \to \catO^{\op} \times \catO$~\cite[(1.16)--(1.18)]{baues_cohomology_1985}:
+$D(\psi) = \Hom_k(B(\omega),A(\omega'))$ for $\psi \colon \omega \to
+\omega'$, a morphism $(\alpha,\beta) \colon \psi \to \alpha\psi\beta$ of
+the factorization category acting by $f \mapsto A(\alpha)\,f\,B(\beta)$. With
+bimodule coefficients this is Hochschild--Mitchell
+cohomology~\cite[(8.5)]{baues_cohomology_1985}; when
+$B = A$ this complex is the Hochschild-degree-$1$ row of the Gerstenhaber--Schack
+bicomplex of the diagram $A$~\cite[Prop.~3.8]{caputi_diagrammatic_2025} (defined
+over a poset in~\cite{gerstenhaber_schack_1983}, with diagrams over a small
+category as in~\cite{gerstenhaber_simplicial_1983}). The group $H^{1}$
+computed below is the cohomology of that row for its horizontal,
+Baues--Wirsching, differential, i.e.\ it lives in bidegree $(1,1)$ of the
+bicomplex; it is not Gerstenhaber--Schack cohomology in total degree~$2$, and
+no vertical (Hochschild) differential is used here. The relation of the
+bicomplex to Baues--Wirsching cohomology is controlled by a spectral sequence
+attributed to Robinson~\cite{robinson_cohomology_2008}
+in~\cite[\S1, Thm.~3.11]{caputi_diagrammatic_2025}.
+
+\begin{remark}[Why $H^{1}$ is the right home]\label{rem:endH0}
+The cohomological formulation is forced rather than chosen. Meaningfulness of
+a design-indexed quantity is the assertion that the family $g^{*}$ is an
+element of $\Nat(B,A) = \int_{\omega} \Hom_k\bigl(B(\omega),A(\omega)\bigr)$,
+an end (the subgroup of $\prod_\omega \Hom_k(B(\omega),A(\omega))$ cut out
+by the equations $A(\psi)h_\omega = h_{\omega'}B(\psi)$, one for each
+$\psi$;~\cite[IX.5]{maclane_categories_1998}); and $H^{0}$ of the
+Baues--Wirsching complex of the diagram \emph{is} that end. The defect
+cochain~\eqref{eq:defect} is then a $1$-cocycle (Lemma~\ref{lem:cocycle})
+whose class in the first derived functor of that
+end~\cite[(8.5)]{baues_cohomology_1985}, $H^{1}$, is the obstruction to correcting $g^{*}$ by an arbitrary $0$-cochain,
+so $H^{1}$ is the only place where a non-meaningful family could leave a trace,
+and the class-relativity of
+Proposition~\ref{wprop:obstruction}(2) below is the statement that the
+$0$-cochain group is too large for that trace to survive unless the admissible
+correction class is cut down.
+\end{remark}
+
+\begin{lemma}[Cocycle property]\label{lem:cocycle}
+The cochain $c$ of~\eqref{eq:defect} satisfies the $1$-cocycle identity
+$c(\psi'\psi) = A(\psi')\,c(\psi) + c(\psi')\,B(\psi)$ for composable
+$\psi,\psi'$, and $c = 0$ iff $g$ is meaningful.
+\end{lemma}
+
+\begin{proof}
+Expand $c(\psi'\psi)$ using functoriality of $A, B$ and add-subtract the
+mixed term $A(\psi')g^{*}_{\omega'}B(\psi)$:
+\[
+A(\psi'\psi)g^{*}_{\omega} - g^{*}_{\omega''}B(\psi'\psi)
+= A(\psi')\bigl(A(\psi)g^{*}_{\omega} - g^{*}_{\omega'}B(\psi)\bigr)
++ \bigl(A(\psi')g^{*}_{\omega'} - g^{*}_{\omega''}B(\psi')\bigr)B(\psi).
+\]
+The second statement is the equivalence recorded after
+Definition~\ref{def:diagalg}: $c = 0$ says that $g^{*}$ is natural, which
+holds iff $g$ is.
+\end{proof}
+
+\begin{proposition}[Obstruction formulation]\label{wprop:obstruction}
+Let $g$ be a design-indexed quantity given only on the objects of $\catO$
+(a ``raw family''), fix an \emph{admissible class} $\mathcal{C} \subseteq
+C^{0} = \prod_\omega \Hom_k(B(\omega),A(\omega))$ of $0$-cochains, and
+suppose one seeks a correction $h \in \mathcal{C}$ such
+that the corrected family $g^{*} + h$ is natural. (A $0$-cochain is merely a
+family of linear maps; $g^{*}+h$ is the dual of a design-indexed quantity only
+when it is a family of algebra homomorphisms, which $\mathcal{C}$ must ensure,
+the recalibration class of Example~\ref{ex:oneway} does so by
+construction.) Then:
+\begin{enumerate}
+\item a corrected natural family exists iff the equation $c = -\,d^{0}h$ is
+solvable with $h \in \mathcal{C}$; for a linear subspace $\mathcal{C}$ this
+is finite linear algebra, and for a finite non-linear class (such as the
+recalibrations of Example~\ref{ex:oneway}) it is finite combinatorics. Both $c$
+and the correcting $h$, when it exists, are computed exactly;
+\item the obstruction is intrinsically \emph{class-relative}. When corrections
+range over the whole $0$-cochain group, the obstruction vanishes identically and
+carries no information: by~\eqref{eq:defect} the defect cochain of any raw
+family is by construction the coboundary $d^{0}g^{*}$ of that family, so
+$[c_g] = 0$ in $H^{1}$ for every $g$ whatever, with no hypothesis. Admissible
+classes must therefore be \emph{proper} subsets of the $0$-cochains to carry
+any obstruction at all;
+\item $H^{1}(\catO;\Hom(B,A))$ is accordingly not an obstruction group for
+individual quantities but an invariant of the design scheme (and of the
+target $\Lambda$), computable by finite linear algebra;
+Example~\ref{ex:oneway-h1} records a nonzero instance.
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}[Why part (2) matters]
+The identity $c_g = d^{0}g^{*}$ is the reason the naive reading of part~(1),
+``non-meaningfulness is certified by a nonzero class in $H^{1}$'', is
+false as stated, and the phrase ``complete obstruction in $H^{1}$'' should not
+be used without naming the class. Equivalently: with corrections ranging over
+all $0$-cochains, the zero family is natural and corrects anything. The cocycle
+identity of Lemma~\ref{lem:cocycle} is then the identity $d^{1}d^{0} = 0$.
+\end{remark}
+
+\begin{proof}
+If $g^{*}+h$ is natural for some $0$-cochain $h$ then $c = -\,d h$, where $d$
+is the Baues--Wirsching differential $\,(d h)(\psi) = A(\psi) h_\omega -
+h_{\omega'} B(\psi)$, so $[c]=0$ in $H^{1}$, a statement carrying no
+information about $\mathcal{C}$; conversely if $c = -\,d h$ with
+$h \in \mathcal{C}$ then $g^* + h$ is natural by reversing the computation.
+Part~(2) is the
+substitution $h = -g^{*}$ in this equivalence, and part~(3) follows since the
+complex is finite-dimensional in each degree.
+\end{proof}
+
+The linear-algebraic skeleton (Lemma~\ref{lem:cocycle} and the displayed
+equivalence) is elementary, and the proof above establishes all three parts.
+The statement is discharged, in the class-relative form that part~(2) forces, by
+an exact computation for the one-way layout; the findings
+are recorded in Example~\ref{ex:oneway} and its successors.
+
+\subsection{The one-way layout as test case}
+
+\begin{example}[One-way layout: the full finite complex]\label{ex:oneway}
+Truncate Example~\ref{ex:oneway-setup} to the smallest nontrivial covariate
+category. \emph{The choice of that category is not a matter of convenience:
+the merge morphism alone cannot host the test case.} Write
+$\catO_{\mathrm{arr}}$ for the two-object category with $\omega_2 = \{1,2\}$
+(two treatment groups), $\omega_1 = \{*\}$ (groups merged) and the single
+non-identity morphism $p \colon \omega_2 \to \omega_1$, and
+$\catO_{\mathrm{full}}$ for the full subcategory of $\FinSet$ on the same two
+objects, which adds the injections $i_1, i_2 \colon \omega_1 \to \omega_2$
+(subgroup selection), the swap $\sigma$ (treatment relabelling) and the
+constants $c_k = i_k p$: eight morphisms in all, with $p\,i_k = \id$ and
+$\sigma i_1 = i_2$. Identifying $\omega_1 = \{*\}$ with $\{1\}$, $i_1$ is
+the insertion $\{1\} \subsetneq \{1,2\}$, the shadow of Tjur's reduction
+to the first group, Lemma~\ref{lem:tjurshadow}, and $i_2 = \sigma i_1$
+is that insertion followed by a relabelling; the reduction to the second
+group is the insertion $\{2\} \subsetneq \{1,2\}$, which $i_2$ represents up
+to the same identification. Discretise the parameters:
+$\Theta(\omega) = M^{\omega} \times S$ with $M, S$ finite sets of admissible
+means and dispersions, $\Theta(\psi)(\mu, s) = ((\mu,\mu), s)$ the diagonal.
+Then:
+\[
+A(\omega_1) = k^{M \times S}, \qquad
+A(\omega_2) = k^{M^{2} \times S}, \qquad
+A(\psi) = \text{restriction to the diagonal}.
+\]
+The Baues--Wirsching $1$-cochains with coefficients as above are indexed by
+the single non-identity morphism $\psi = p$ (identities carry no information
+after normalisation), so
+\[
+C^{0} = \Hom_k(B(\omega_1), A(\omega_1)) \oplus \Hom_k(B(\omega_2),
+A(\omega_2)),
+\qquad
+C^{1}_{\mathrm{norm}} = \Hom_k\bigl(B(\omega_2), A(\omega_1)\bigr),
+\]
+the latter being the coefficient of the natural system at $\psi = p$, and
+$H^{1}$ is the cokernel of the explicit linear map
+$d^{0}(h_1,h_2) = A(\psi)h_2 - h_1 B(\psi)$. Everything is therefore a finite
+matrix computation once the candidate $g$ is fixed. Take for $g$ the
+\emph{marginal} (total) dispersion under balanced allocation,
+\[
+g_{\omega_1}(\mu,s) = s,
+\qquad
+g_{\omega_2}\bigl((\mu_1,\mu_2),s\bigr) = s + \tfrac{(\mu_1-\mu_2)^2}{4},
+\]
+the one-way analogue of Tjur's $\alpha + \beta\bar x$ of
+Example~\ref{ex:alphabetaxbar}: a genuine parameter contaminated by a term that
+depends on which groups the design includes. The quantity is ours: it should
+not be confused with the overdispersion passage of Tjur's discussion, which
+concerns whether a generalised linear model admits a scale extension leaving
+the link-linear estimates unchanged, a non-existence claim about a family
+of models, not a failure of naturality, and one on which nothing here bears.
+Throughout, the target
+functor $\Lambda$ is constant at the finite set
+$T \coloneqq g_{\omega_2}\bigl(\Theta(\omega_2)\bigr) \subset \mathbb{Q}$ of
+values of $g$ (which contains $S = g_{\omega_1}(\Theta(\omega_1))$), with
+$\Lambda(\psi) = \id_{T}$; accordingly $B(\omega) = k^{T}$ for both objects and
+$B(\psi) = \id$. The computation was
+carried out in exact arithmetic, the defect cochain, the cocycle identity,
+and the corrected linear system over $\mathbb{Q}$; the two cochain-complex
+ranks modulo three $31$-bit primes, in agreement, then re-derived exactly over
+$\mathbb{Q}$, and returns three findings.
+\end{example}
+
+\begin{example}[Findings]\label{ex:oneway-findings}
+\emph{(i) The arrow category is blind.} Over $\catO_{\mathrm{arr}}$ the family
+above is \emph{natural}: its defect cochain vanishes identically, because the
+between-group term $(\mu_1-\mu_2)^2/4$ vanishes on the diagonal sub-model
+$\Theta(p)$. Moreover $H^{1}(\catO_{\mathrm{arr}};\Hom(B,A)) = 0$ (for $|M| =
+|S| = 2$: $\dim C^{1} = \dim Z^{1} = \dim B^{1} = 16$), so no quantity whatever
+carries a class there. It is the subgroup-selection morphisms $i_1, i_2$, not
+the merge, that detect the failure, which is to say that the failure is
+already visible to Tjur's own criterion, quantified over removal of sample
+points alone: the defect at the insertion $i_1$ is a violation of his
+condition at the reduction to the first group (Lemma~\ref{lem:tjurshadow}).
+
+\emph{(ii) Non-meaningfulness certified; a deterministic repair recovered.} Over
+$\catO_{\mathrm{full}}$ with $M = \{0,1\}$, $S = \{1,2\}$, so $T =
+\{1,\tfrac54,2,\tfrac94\}$: the defect cochain is nonzero exactly on
+$\{i_1,i_2,c_1,c_2\}$ and zero on $p$ and $\sigma$, and the cocycle identity of
+Lemma~\ref{lem:cocycle} was checked entrywise on all $22$ composable pairs.
+Solving $c = -\,d^{0}h$ over the full $0$-cochain group, which by
+Proposition~\ref{wprop:obstruction}(2) must succeed, returns a corrected
+family that is again deterministic; the solution obtained by setting the free
+parameters of the row-reduced system to zero is the \emph{within-group}
+dispersion $((\mu_1,\mu_2),s) \mapsto s$, i.e.\ the between-group term is
+discarded. The solution set is the affine space  $\,-g^{*} + \Nat(B,A)$ and
+contains other deterministic members, so no canonicity is claimed for this
+one; the vanishing of the unrestricted class (part~(2) of the Proposition)
+is thus not a defect of the theory, and the statistically sensible repair is
+among the solutions.
+
+\emph{(iii) Nonzero obstruction relative to an admissible class.} Take as
+admissible the \emph{information-bearing recalibrations}: corrected quantities
+$r_\omega \circ g_\omega$ with $r_\omega \colon T \to T$ and $r_{\omega_2}$
+non-constant, so that the quantity may be re-expressed on its value scale but
+must remain a non-trivial function of the observed marginal dispersion.
+Naturality along $i_1, i_2$ reads $r_{\omega_1}(s) = r_{\omega_2}\bigl(s +
+(\mu_1-\mu_2)^2/4\bigr)$ for all $\mu, s$, and forces $r_{\omega_2}$ to be
+constant on the partition of $T$ generated by $s \sim s + (\mu_1-\mu_2)^2/4$,
+reducing feasibility to an exact union--find computation; the conditions
+along the other morphisms add nothing (naturality along $\sigma$ holds for
+every recalibration since $g_{\omega_2}$ is symmetric; along $p$ it reads
+$r_{\omega_2} = r_{\omega_1}$ on $S$, the case $\mu_1 = \mu_2$ of the
+condition along $i_k$; and along $c_k = i_k p$ it follows from the latter).
+Call the design \emph{scale-confounded} when some marginal value
+$s + (\mu_1-\mu_2)^2/4$ with $\mu_1 \neq \mu_2$ is itself an admissible
+within-group dispersion, i.e.\ lies in $S$. With $M = \{0,1\}$ and
+$S = \{1,\tfrac54\}$, or already with $S = \{1,2\}$ at three mean levels
+$M = \{0,1,2\}$, the partition collapses to a single block, every natural
+recalibration is constant, and the obstruction relative to this class is
+nonzero: no information-bearing recalibration of the marginal dispersion is
+natural. (With $M = \{0,1\}$, $S = \{1,2\}$ as in~(ii) the partition has the
+two blocks $\{1,\tfrac54\}$ and $\{2,\tfrac94\}$, and a non-constant natural
+recalibration exists.)
+\end{example}
+
+\begin{example}[A new invariant]\label{ex:oneway-h1}
+Computing $H^{1}(\catO;\Hom(B,A))$ for its own sake, part~(3) of
+Proposition~\ref{wprop:obstruction}, gives $0$ for $\catO_{\mathrm{arr}}$,
+and for $\catO_{\mathrm{full}}$ a group that vanishes at two levels of the
+treatment mean but not at three: with $M = \{0,1,2\}$, $S = \{1,2\}$ and
+$\Lambda$ constant at $T$ as above (so $|T| = 5$),
+$\dim_{k} H^{1}(\catO_{\mathrm{full}};\Hom(B,A)) = 10 = 2\,|T|$, computed
+as in Example~\ref{ex:oneway}. The group depends on $\Lambda$ as well as on
+$\catO$: with $B$ constant and $B(\psi) = \id$ it is the $|T|$-fold direct sum
+of the cohomology with coefficients $\psi \mapsto A(\operatorname{cod}\psi)$.
+This is the instance behind the phrase ``nontrivial'' in that part. Its
+statistical meaning is not known to us and is not pursued here.
+\end{example}
+
+\begin{caveat}[Scope of the cohomological claim]
+The correct summary of this section is: \emph{for finite design schemes,
+meaningfulness of a design-indexed quantity is decidable, and its correctability
+within a prescribed statistically admissible class is controlled by a computable
+obstruction relative to that class}. The class-relativity is not a hedge but a
+theorem (Proposition~\ref{wprop:obstruction}(2)). This must not be conflated
+with a cohomological proof of the bridge: the bridge
+(Section~\ref{sec:bridge}) is proved by Kleisli transposition and
+needs no cohomology; the cohomology enters one level up, where coherence of
+quantities over designs is at stake.
+\end{caveat}
+
+\begin{remark}[Information cohomology]\label{rem:infocohomology}
+A separate cohomological tradition attaches invariants to statistical
+structures directly: entropy is characterised as the essentially unique
+$1$-cocycle of information cohomology in the finite discrete
+case~\cite{baudot_homological_2015} (for the continuous extension
+see~\cite{vigneaux_information_2021}), as the unique (up to a non-negative
+scalar) functorial, convex-linear and continuous information-loss
+measure~\cite{baez_characterization_2011}, as an operad
+derivation~\cite{bradley_entropy_2021}, and defined, in divergence-enriched
+Markov categories, as the divergence of a morphism from
+determinism~\cite{perrone_markov_2024}; for the functional equation
+underlying the cohomological characterisation see~\cite{bennequin_functional_2020}, and
+for cohomological models of information networks in the same tradition
+see~\cite{manin_homotopy_2024}. The complex of
+Definition~\ref{def:diagalg} and the information-cohomological complexes have
+different coefficients and different indexing categories, and \emph{no
+comparison map between them is constructed here}.
+
+A prior question sits underneath any such comparison, and we state it
+separately because it is not cohomological. Information cohomology carries
+its own account of conditioning, organised around Shannon's chain
+rule~\cite{baudot_homological_2015,vigneaux_information_2021}, and touches
+statistical independence only through the vanishing of mutual
+information~\cite{baudot_homological_2015}; that account is not the one native
+to Markov categories, of which Section~\ref{sec:markov} recalls only the
+fragment used here: there, conditioning is disintegration in the sense
+of~\cite{cho_disintegration_2019} (Bayesian inversion being the special case
+with a prior) and independence is the diagrammatic
+condition of~\cite{fritz_synthetic_2020}. Whether the two agree, and under
+what hypotheses, is to our knowledge not known; no translation between them
+is constructed or assumed anywhere in this paper, and none of its results
+depends on one existing. We record this because the comparison of the two
+formalisms at the level of these primitives is logically prior to any
+comparison of their cohomologies.
+\end{remark}
+
+
+\section{Scope and non-claims}\label{sec:nonclaims}
+
+For the record, two statements adjacent to this paper's results are
+formulable in the present framework but are \emph{not} established here or,
+to our knowledge, anywhere.
+
+\begin{caveat}[Paradigms as morphism-shapes]
+Fisherian, Bayesian, nonparametric, statistical-learning and hybrid
+latent-variable modelling can each be \emph{presented} as a choice of
+morphism-shape on the shared parameter--data structure of
+Section~\ref{sec:bridge} (e.g.\ a latent-variable model as a composite
+through an unobserved object). These presentations organise the paradigms;
+they do not prove any equivalence between paradigm-specific theorems, and no
+such claim is made.
+\end{caveat}
+
+
+\begin{caveat}[Nonparametric and infinite-dimensional limits]
+All theorems above are stated for the parametric, measurably-regular case.
+Presenting nonparametric models as $(\text{co})$limits of finite-dimensional
+ones in $\Stoch$ is a programme, not a technique available off the shelf:
+$\Stoch$ is not complete or cocomplete in the ways naive arguments require,
+and nothing here should be described as securing the nonparametric case.
+\end{caveat}
+
+
+
+
+\appendix
+\section{Proof of Proposition~\ref{wprop:copower}}\label{app:copower}
+
+Throughout, for a set $A$ we write $A \cdot I$ for the measurable space
+$(A, 2^{A})$. This is the coproduct in $\Meas$ of $A$ copies of the one-point
+space, and $\del$ preserves coproducts (Remark~\ref{rem:repr}), so it is the
+copower of the monoidal unit in $\Stoch$; with this convention,
+``the domain of $q$ is a copower'' means that the domain of $q$ carries its
+full power set. For $p \colon \Theta_0 \to \Prb(S)$ the transpose
+$\widehat{p} \colon \Theta_0 \cdot I \rightsquigarrow S$ is the kernel
+$\widehat{p}(\theta)(B) = p(\theta)(B)$, measurable in $\theta$ because the
+domain is discrete; conversely every kernel $q \colon A \cdot I
+\rightsquigarrow S$ is $\widehat{\check q}$ for the function
+$\check q \colon a \mapsto q(a)$. This is~\eqref{eq:copower}, and the two
+assignments are mutually inverse.
+
+The proof uses four facts about deterministic morphisms and one about
+$\{0,1\}$-valued measures on power sets. The first is recorded in
+\S\ref{sec:markov} with a reference; the short proofs are included to keep
+the appendix self-contained.
+
+\begin{lemma}\label{lem:app-det}
+Let $k \colon X \rightsquigarrow Y$ be a morphism of $\Stoch$.
+\begin{enumerate}
+\item $k$ is deterministic if and only if $k(x)(B) \in \{0,1\}$ for every
+$x \in X$ and every $B \in \Sigma_Y$~\cite[Ex.~10.4]{fritz_synthetic_2020}.
+\item If $\Sigma_Y$ separates points, then $\del$ is injective on
+$\Meas(X,Y)$.
+\item If $\Sigma_Y$ is countably generated and separates points, then every
+$\{0,1\}$-valued probability measure on $Y$ is $\delta_y$ for a unique
+$y \in Y$; consequently every deterministic $k \colon X \rightsquigarrow Y$
+is $\del f$ for a unique measurable $f \colon X \to Y$.
+\item If $v \colon A \rightsquigarrow X$ and $u \colon X \rightsquigarrow A$
+are mutually inverse and $v$ is deterministic, then so is
+$u$~\cite[Lem.~10.9(c)]{fritz_synthetic_2020}.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(1) In $\Stoch$ the copy map is the Dirac kernel of the diagonal, so
+by~\eqref{eq:push} and~\eqref{eq:pull} the kernel $\mathrm{copy}_Y \circ k$
+sends $x$ to the image of $k(x)$ under the diagonal $Y \to Y \times Y$, while
+$(k \otimes k) \circ \mathrm{copy}_X$ sends $x$ to the product measure
+$k(x) \otimes k(x)$. On a measurable rectangle $B \times C$ these two
+measures take the values $k(x)(B \cap C)$ and $k(x)(B)\,k(x)(C)$
+respectively, and since rectangles form a $\pi$-system generating
+$\Sigma_Y \otimes \Sigma_Y$, two probability measures on $Y \times Y$ agreeing
+on rectangles agree. Hence $k$ is deterministic iff
+$k(x)(B \cap C) = k(x)(B)\,k(x)(C)$ for all $x$, $B$, $C$. Taking $B = C$
+shows that each $k(x)$ is $\{0,1\}$-valued. Conversely, if $\mu$ is a
+$\{0,1\}$-valued probability measure then $\mu(B \cap C) = 1$ iff
+$\mu(B) = \mu(C) = 1$, if both are $1$ then
+$\mu\bigl(Y \setminus (B \cap C)\bigr) \le \mu(Y \setminus B) + \mu(Y
+\setminus C) = 0$, and if one is $0$ then $\mu(B \cap C) = 0$, that is,
+$\mu(B \cap C) = \mu(B)\,\mu(C)$.
+
+(2) $\del f = \del g$ means $\delta_{f(x)} = \delta_{g(x)}$ for every $x$,
+and if $\Sigma_Y$ separates points then $\delta_y = \delta_{y'}$ forces
+$y = y'$.
+
+(3) Let $(B_n)_{n}$ generate $\Sigma_Y$ and let $\mu$ be $\{0,1\}$-valued.
+Put $C_n = B_n$ if $\mu(B_n) = 1$ and $C_n = Y \setminus B_n$ otherwise, and
+$C = \bigcap_n C_n$; then $\mu(C) = 1$, so $C \neq \emptyset$. If
+$y, y' \in C$, the class of those $B \in \Sigma_Y$ containing both or neither
+of $y, y'$ is a $\sigma$-algebra containing every $B_n$, hence all of
+$\Sigma_Y$; as $\Sigma_Y$ separates points, $y = y'$. Thus $C = \{y\}$, so
+$\mu(\{y\}) = 1$ and $\mu = \delta_y$, with $y$ unique because $\Sigma_Y$
+separates points. For the consequence: by~(1) each $k(x)$ is
+$\{0,1\}$-valued, hence $\delta_{f(x)}$ for a unique $f(x)$; $f$ is
+measurable because $f^{-1}(B) = \{x : k(x)(B) = 1\} \in \Sigma_X$ for every
+$B \in \Sigma_Y$; and $k = \del f$ by definition of $\del$. Uniqueness of $f$
+is~(2).
+
+(4) This holds in any Markov category. From $v \circ u = \id_X$ and
+determinism of $v$,
+$\mathrm{copy}_X = \mathrm{copy}_X \circ v \circ u = (v \otimes v) \circ
+\mathrm{copy}_A \circ u$, hence
+$(u \otimes u) \circ \mathrm{copy}_X = \bigl((u \circ v) \otimes (u \circ
+v)\bigr) \circ \mathrm{copy}_A \circ u = \mathrm{copy}_A \circ u$ by
+$u \circ v = \id_A$.
+\end{proof}
+
+\begin{lemma}[Ulam]\label{lem:app-ulam}
+Call a countably additive $\{0,1\}$-valued probability measure on
+$(A, 2^{A})$ that is not a Dirac measure a \emph{two-valued measure} on the
+set $A$.
+\begin{enumerate}
+\item Two-valued measures on $A$ correspond bijectively to countably
+complete non-principal ultrafilters on $A$~\cite[(10.3)--(10.4)]{jech_set_2003}.
+\item If $A$ carries no two-valued measure, then neither does any set of
+cardinality at most $|A|$, nor the power set
+$2^{A}$~\cite[Bem.~2 and Satz~1]{ulam_masstheorie_1930}. In particular no
+set of cardinality at most that of the continuum carries one.
+\item In modern terms, $A$ carries a two-valued measure if and only if there
+is a measurable cardinal $\kappa \le |A|$~\cite[Lemma~10.2 and
+Def.~10.3]{jech_set_2003}; Ulam's original form is that $A$ carries none
+when no weakly inaccessible cardinal is
+$\le |A|$~\cite[Satz~(A)]{ulam_masstheorie_1930}, cf.~\cite[Thm.~10.1]{jech_set_2003}.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(1) For a $\{0,1\}$-valued $\mu$ the class
+$\mathcal U = \{B \subseteq A : \mu(B) = 1\}$ is an ultrafilter on $A$,
+countably complete by countable additivity, and non-principal exactly when
+$\mu$ is not Dirac; conversely a countably complete non-principal ultrafilter
+$\mathcal U$ defines such a $\mu$ by $\mu(B) = 1$ iff $B \in \mathcal U$.
+
+(2) If $i \colon B \to A$ is injective and $\mu$ is a two-valued measure on
+$B$, then $C \mapsto \mu(i^{-1}(C))$ is a two-valued measure on $A$: it is
+countably additive, gives $A$ mass $\mu(B) = 1$, and vanishes on singletons
+because $i^{-1}(\{a\})$ has at most one element. This proves the first
+assertion. For the power set, identify $2^{A}$ with the set of functions
+$A \to \{0,1\}$ and suppose $\nu$ is a two-valued measure on it. For each
+$a \in A$ exactly one of the two sets $\{g : g(a) = 0\}$, $\{g : g(a) = 1\}$
+has $\nu$-measure $1$; call it $E_a$. We claim that
+$\nu\bigl(\bigcap_{a} E_a\bigr) = 1$. Otherwise $\nu\bigl(\bigcup_a (2^{A}
+\setminus E_a)\bigr) = 1$; well-order $A$ as $(a_\xi)_{\xi < \lambda}$ and
+put $D_\xi \coloneqq (2^{A} \setminus E_{a_\xi}) \setminus
+\bigcup_{\eta < \xi} (2^{A} \setminus E_{a_\eta})$, pairwise disjoint sets of
+$\nu$-measure $0$ with union $\bigcup_a (2^{A} \setminus E_a)$. Then
+$C \mapsto \nu\bigl(\bigcup_{\xi \in C} D_\xi\bigr)$ is a two-valued measure
+on $\lambda$, hence on $A$ by the first assertion, contrary to hypothesis.
+But $\bigcap_a E_a$ is the single function $g_0$ with $g_0(a)$ the value
+singled out by $E_a$, so $\nu(\{g_0\}) = 1$, contradicting non-principality.
+Finally, a countable set carries no two-valued measure, since countable
+additivity and vanishing on singletons would force total mass $0$; so
+neither does $2^{\aleph_0}$, nor any set of cardinality at most
+$2^{\aleph_0}$.
+
+(3) If $A$ carries a countably complete non-principal ultrafilter, so does
+the cardinal $|A|$, by transport along a bijection; the least cardinal
+$\kappa$ carrying one is then $\le |A|$, and it is measurable because such
+an ultrafilter on it is automatically
+$\kappa$-complete~\cite[Lemma~10.2]{jech_set_2003}. Conversely a measurable
+$\kappa \le |A|$ carries a $\kappa$-complete, hence countably complete,
+non-principal ultrafilter, which transports to $A$ by the injection argument
+of~(2). Ulam's form is subsumed by the modern one, since every measurable
+cardinal is strongly inaccessible~\cite[Lemma~10.4]{jech_set_2003}.
+\end{proof}
+
+Hypothesis~(a) of Proposition~\ref{wprop:copower} is thus the statement that
+no measurable cardinal is $\le |\Theta_0'|$. By Lemma~\ref{lem:app-ulam}(2)
+it holds outright, with no large-cardinal input, whenever $\Theta_0'$ has at
+most the cardinality of the continuum, which covers every parameter set in
+this paper, and it holds for every set if measurable cardinals do not
+exist.
+
+\begin{proof}[Proof of Proposition~\ref{wprop:copower}]
+\emph{The functor.} On objects, $\Jc(\Theta_0,S,p) = \widehat p$. On a
+morphism $(r,f) \colon (\Theta_0,S,p) \to (\Theta_0',S',p')$, a function
+$r \colon \Theta_0 \to \Theta_0'$ and a measurable $f \colon S \to S'$ with
+$\Prb(f) \circ p = p' \circ r$ (Definition~\ref{def:statmod}), put
+$\Jc(r,f) = (\del r, \del f)$. Here $r$ is measurable because its domain is
+discrete, so both components are Dirac kernels, hence deterministic
+(Definition~\ref{def:dirac}); by Lemma~\ref{lem:square-pointwise} the pair is
+a square from $\widehat p$ to $\widehat{p'}$ iff
+$\widehat{p'}(r(\theta)) = f_{*}\,\widehat p(\theta)$ for every $\theta$,
+i.e.\ iff $p' \circ r = \Prb(f) \circ p$, which is the hypothesis. Since
+$\del$ is a functor and composition in $\Arrdet{\Stoch}$ is componentwise,
+$\Jc$ preserves identities and composites.
+
+\emph{Part~(1).} By the conventions above, $(\Theta_0,S,p) \mapsto
+\widehat p$ is a bijection from the objects of $\StatMod$ onto the arrows of
+$\Stoch$ whose domain carries its full power set, with inverse
+$q \mapsto (A,S,\check q)$ for $q \colon A \cdot I \rightsquigarrow S$: the
+domain of $\widehat p$ determines $\Theta_0$ as its underlying set, the
+codomain determines $S$, and $p = \check{\widehat p}$. In particular $\Jc$ is
+injective on objects and lands in $\Arrcop{\Stoch}$. For essential
+surjectivity onto $\Arrcop{\Stoch}$, let $q \colon X \rightsquigarrow S$ with
+$X \cong A \cdot I$ in $\Stoch$, say via mutually inverse
+$v \colon A \cdot I \rightsquigarrow X$ and
+$u \colon X \rightsquigarrow A \cdot I$. We show that both are deterministic,
+arguing from the copower side, where singletons are measurable. For $a \in A$
+put $X_a \coloneqq \{x \in X : u(x)(\{a\}) = 1\}$, measurable since
+$x \mapsto u(x)(\{a\})$ is. Since $u \circ v = \id_{A \cdot I}$,
+\[
+1 \;=\; \delta_a(\{a\}) \;=\; (u \circ v)(a)(\{a\})
+\;=\; \int_X u(x)(\{a\})\, v(a)(\mathrm{d}x),
+\]
+and the integrand is bounded by $1$, so $v(a)(X_a) = 1$; in particular
+$X_a \neq \emptyset$. For $x \in X_a$ the probability measure $u(x)$ on
+$2^{A}$ gives mass $1$ to $\{a\}$, so $u(x) = \delta_a$, and then, since
+$v \circ u = \id_X$,
+\[
+\delta_x(F) \;=\; (v \circ u)(x)(F)
+\;=\; \int_A v(b)(F)\, u(x)(\mathrm{d}b) \;=\; v(a)(F)
+\qquad (F \in \Sigma_X).
+\]
+Thus $v(a) = \delta_x$ for every $x \in X_a$. Choosing $x_a \in X_a$ for each
+$a$ (axiom of choice) gives a function $f \colon A \to X$, measurable because
+its domain is discrete, with $v = \del f$; so $v$ is deterministic, and $u$
+is deterministic by Lemma~\ref{lem:app-det}(4). Now
+$q \circ v \colon A \cdot I \rightsquigarrow S$ has domain $A \cdot I$, so
+$q \circ v = \Jc\bigl(A, S, (q \circ v)^{\vee}\bigr)$; and
+$(v, \id_S) \colon q \circ v \to q$ and $(u, \id_S) \colon q \to q \circ v$
+are squares, $q \circ v = \id_S \circ (q \circ v)$ and
+$(q \circ v) \circ u = q = \id_S \circ q$, which are mutually inverse in
+$\Arrdet{\Stoch}$, since $(u,\id_S) \circ (v,\id_S) = (u \circ v, \id_S) =
+(\id, \id)$ and symmetrically. Hence
+$q \cong \Jc\bigl(A,S,(q \circ v)^{\vee}\bigr)$.
+
+\emph{Part~(2).} Fix $x = (\Theta_0,S,p)$ and $x' = (\Theta_0',S',p')$
+with $x'$ satisfying~(a) and~(b), and let $(a,b)$ be a square from
+$\widehat p$ to $\widehat{p'}$. Its left leg
+$a \colon \Theta_0 \cdot I \rightsquigarrow \Theta_0' \cdot I$ is
+deterministic, so by Lemma~\ref{lem:app-det}(1) each $a(\theta)$ is a
+countably additive $\{0,1\}$-valued probability measure on $2^{\Theta_0'}$;
+by~(a) it is $\delta_{r(\theta)}$ for a unique $r(\theta) \in \Theta_0'$, and
+$r$ is measurable because $\Theta_0$ is discrete, so $a = \del r$. The right
+leg is $b = \del f$ for a unique measurable $f \colon S \to S'$, by~(b) for
+$S'$ and Lemma~\ref{lem:app-det}(3). By Lemma~\ref{lem:square-pointwise},
+$(\del r, \del f)$ is a square iff $p' \circ r = \Prb(f) \circ p$, so
+$(r,f)$ is a morphism of $\StatMod$ with $\Jc(r,f) = (a,b)$: the map
+$\StatMod(x,x') \to \Arrdet{\Stoch}(\Jc x, \Jc x')$ is surjective. It is
+injective by Lemma~\ref{lem:app-det}(2), since $2^{\Theta_0'}$ separates
+points and $\Sigma_{S'}$ does by~(b).
+
+\emph{Part~(3).} Write $\mathcal A$ for the full subcategory of
+$\Arrcop{\Stoch}$ described in the statement. For $x = (\Theta_0,S,p)$ in
+$\StatMod_{(a),(b)}$ the object $\Jc x = \widehat p$ has domain
+$\Theta_0 \cdot I$ with $\Theta_0$ satisfying~(a) and codomain $S$
+satisfying~(b), so $\Jc$ restricts to a functor
+$\StatMod_{(a),(b)} \to \mathcal A$. It is fully faithful by part~(2),
+because every object of $\StatMod_{(a),(b)}$ satisfies~(a) and~(b), and it
+is essentially surjective by the argument of part~(1): for
+$q \colon X \rightsquigarrow S$ in $\mathcal A$, with
+$v \colon A \cdot I \rightsquigarrow X$ an isomorphism and $A$
+satisfying~(a) as in the definition of $\mathcal A$, the object
+$\bigl(A,S,(q \circ v)^{\vee}\bigr)$ lies in $\StatMod_{(a),(b)}$ and
+$q \cong \Jc\bigl(A,S,(q \circ v)^{\vee}\bigr)$. A fully faithful and
+essentially surjective functor is an
+equivalence~\cite[IV.4, Thm.~1(iii)]{maclane_categories_1998}.
+
+\emph{The finite case.} Every object of $\FinStoch$ is $A \cdot I$ for a
+finite set $A$, so the object bijection of part~(1) restricts to a
+bijection from the objects of $\StatMod_{\mathrm{fin}}$ onto the morphisms of
+$\FinStoch$, i.e.\ onto the objects of $\Arrdet{\FinStoch}$ (which, $\FinStoch$
+being full in $\Stoch$, is the full subcategory of $\Arrdet{\Stoch}$ on these
+objects). Conditions~(a) and~(b) hold for every finite set and every finite
+discrete space, so by part~(2) $\Jc$ is bijective on every hom-set. A
+functor bijective on objects and on hom-sets is an isomorphism of categories,
+so $\StatMod_{\mathrm{fin}} \cong \Arrdet{\FinStoch}$, which is more than the
+stated equivalence.
+\end{proof}
+
+\bibliographystyle{plain}
+\bibliography{calamus_bridge_draft_clean_v33k}
+
+\end{document}

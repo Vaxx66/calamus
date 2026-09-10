@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this code or cite the manuscript, please use the metadata below."
+type: software
+title: "calamus: computational supplement to 'Statistical models as natural transformations'"
+authors:
+  - family-names: Vaccarino
+    given-names: Francesco
+    affiliation: "Dipartimento di Scienze Matematiche 'G. L. Lagrange', Politecnico di Torino"
+repository-code: "https://github.com/Vaxx66/calamus"
+license: MIT
+date-released: 2026-09-10
+version: "v33k"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Vaccarino
+      given-names: Francesco
+  title: "Statistical models as natural transformations: a bridge from the McCullagh–Brøns hexagon to Markov categories"
+  year: 2026
+  # identifiers:
+  #   - type: other
+  #     value: "arXiv:XXXX.XXXXX"
