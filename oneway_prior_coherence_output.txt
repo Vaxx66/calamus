@@ -1,0 +1,86 @@
+==============================================================================
+RUN: M={0,1}, S={1,4}          (base case)
+  M = [0, 1],  S = ['1', '4']
+  |Theta(w1)| = 4, |Theta(w2)| = 8; ambient dim of (pi_1, pi_2) = 12
+  Omega_red-coherent priors:   affine dimension =   7   (Proposition 8.4 predicts 7)
+  Omega_sel-coherent priors:   affine dimension =   5   (Proposition 8.4 predicts 5)
+  Omega_inj-coherent priors:   affine dimension =   5   (Proposition 8.4 predicts 5)
+  Omega_full-coherent priors:  affine dimension =   3   (Proposition 8.4 predicts 3)
+  (unconstrained probability pairs: 10)
+  (diagonal subset of Theta(w2) has 4 of 8 points; off-diagonal mass forced to 0 by the merge)
+  named prior rules:
+    uniform             : coherent at i1,i2 = True
+    Jeffreys analogue   : coherent at i1,i2 = False,  TV defect = i1: 8/153, i2: 8/153
+  marginals-agree constraint (i1 vs i2) has rank 2 on Theta(w2)-space of dim 8
+==============================================================================
+RUN: M={0,1}, S={1,4,9}
+  M = [0, 1],  S = ['1', '4', '9']
+  |Theta(w1)| = 6, |Theta(w2)| = 12; ambient dim of (pi_1, pi_2) = 18
+  Omega_red-coherent priors:   affine dimension =  11   (Proposition 8.4 predicts 11)
+  Omega_sel-coherent priors:   affine dimension =   8   (Proposition 8.4 predicts 8)
+  Omega_inj-coherent priors:   affine dimension =   8   (Proposition 8.4 predicts 8)
+  Omega_full-coherent priors:  affine dimension =   5   (Proposition 8.4 predicts 5)
+  (unconstrained probability pairs: 16)
+  (diagonal subset of Theta(w2) has 6 of 12 points; off-diagonal mass forced to 0 by the merge)
+  named prior rules:
+    uniform             : coherent at i1,i2 = True
+    Jeffreys analogue   : coherent at i1,i2 = False,  TV defect = i1: 24408/349643, i2: 24408/349643
+  marginals-agree constraint (i1 vs i2) has rank 3 on Theta(w2)-space of dim 12
+==============================================================================
+RUN: M={0,1,2}, S={1,4}
+  M = [0, 1, 2],  S = ['1', '4']
+  |Theta(w1)| = 6, |Theta(w2)| = 18; ambient dim of (pi_1, pi_2) = 24
+  Omega_red-coherent priors:   affine dimension =  17   (Proposition 8.4 predicts 17)
+  Omega_sel-coherent priors:   affine dimension =  13   (Proposition 8.4 predicts 13)
+  Omega_inj-coherent priors:   affine dimension =  11   (Proposition 8.4 predicts 11)
+  Omega_full-coherent priors:  affine dimension =   5   (Proposition 8.4 predicts 5)
+  (unconstrained probability pairs: 22)
+  (diagonal subset of Theta(w2) has 6 of 18 points; off-diagonal mass forced to 0 by the merge)
+  named prior rules:
+    uniform             : coherent at i1,i2 = True
+    Jeffreys analogue   : coherent at i1,i2 = False,  TV defect = i1: 8/153, i2: 8/153
+  marginals-agree constraint (i1 vs i2) has rank 4 on Theta(w2)-space of dim 18
+==============================================================================
+RUN: M={0,1}, S={1}            (degenerate control)
+  M = [0, 1],  S = ['1']
+  |Theta(w1)| = 2, |Theta(w2)| = 4; ambient dim of (pi_1, pi_2) = 6
+  Omega_red-coherent priors:   affine dimension =   3   (Proposition 8.4 predicts 3)
+  Omega_sel-coherent priors:   affine dimension =   2   (Proposition 8.4 predicts 2)
+  Omega_inj-coherent priors:   affine dimension =   2   (Proposition 8.4 predicts 2)
+  Omega_full-coherent priors:  affine dimension =   1   (Proposition 8.4 predicts 1)
+  (unconstrained probability pairs: 4)
+  (diagonal subset of Theta(w2) has 2 of 4 points; off-diagonal mass forced to 0 by the merge)
+  named prior rules:
+    uniform             : coherent at i1,i2 = True
+    Jeffreys analogue   : coherent at i1,i2 = True
+  marginals-agree constraint (i1 vs i2) has rank 1 on Theta(w2)-space of dim 4
+==============================================================================
+CLOSED-FORM CHECK (Proposition 8.4), |M| = 2,3,4 and |S| = 1,2,3
+  predicted: red  |M|^2|S| - 1
+             sel  |M|^2|S| - 1 - |S|(|M|-1)
+             inj  |M|(|M|+1)|S|/2 - 1
+             full |M||S| - 1
+    |M|=2 |S|=1:  red 3 (pred 3)  sel 2 (pred 2)  inj 2 (pred 2)  full 1 (pred 1)   sel-inj = 0   OK
+    |M|=2 |S|=2:  red 7 (pred 7)  sel 5 (pred 5)  inj 5 (pred 5)  full 3 (pred 3)   sel-inj = 0   OK
+    |M|=2 |S|=3:  red 11 (pred 11)  sel 8 (pred 8)  inj 8 (pred 8)  full 5 (pred 5)   sel-inj = 0   OK
+    |M|=3 |S|=1:  red 8 (pred 8)  sel 6 (pred 6)  inj 5 (pred 5)  full 2 (pred 2)   sel-inj = 1   OK
+    |M|=3 |S|=2:  red 17 (pred 17)  sel 13 (pred 13)  inj 11 (pred 11)  full 5 (pred 5)   sel-inj = 2   OK
+    |M|=3 |S|=3:  red 26 (pred 26)  sel 20 (pred 20)  inj 17 (pred 17)  full 8 (pred 8)   sel-inj = 3   OK
+    |M|=4 |S|=1:  red 15 (pred 15)  sel 12 (pred 12)  inj 9 (pred 9)  full 3 (pred 3)   sel-inj = 3   OK
+    |M|=4 |S|=2:  red 31 (pred 31)  sel 25 (pred 25)  inj 19 (pred 19)  full 7 (pred 7)   sel-inj = 6   OK
+    |M|=4 |S|=3:  red 47 (pred 47)  sel 38 (pred 38)  inj 29 (pred 29)  full 11 (pred 11)   sel-inj = 9   OK
+  closed forms: confirmed
+==============================================================================
+PRODUCT-PRIOR CRITERION  (pi_w = unif(M^w) tensor rho_w)
+    rho design-independent: coherent = True,  TV = ['0', '0']
+    rho design-dependent  : coherent = False,  TV = ['1/10', '1/10']
+==============================================================================
+CLOSED-FORM DEFECT CHECK (Jeffreys analogue, Proposition 8.5(2))
+  S is listed through the square roots r of its elements s = r^2
+    |M|=2, S={1,4}: TV(i1)=TV(i2)=8/153 (pred 8/153), TV(p)=1/2 (pred 1/2), bound 1-1/|M|=1/2 attained   OK
+    |M|=2, S={1,4,9}: TV(i1)=TV(i2)=24408/349643 (pred 24408/349643), TV(p)=1/2 (pred 1/2), bound 1-1/|M|=1/2 attained   OK
+    |M|=3, S={1,4}: TV(i1)=TV(i2)=8/153 (pred 8/153), TV(p)=2/3 (pred 2/3), bound 1-1/|M|=2/3 attained   OK
+    |M|=2, S={1,9/4}: TV(i1)=TV(i2)=216/3395 (pred 216/3395), TV(p)=1/2 (pred 1/2), bound 1-1/|M|=1/2 attained   OK
+    |M|=2, S={1,4,9,16}: TV(i1)=TV(i2)=3544128/45520915 (pred 3544128/45520915), TV(p)=1/2 (pred 1/2), bound 1-1/|M|=1/2 attained   OK
+    |M|=2, S={1/4} u {(k/100)^2 : 105<=k<=229}: TV(i1)=TV(i2)=0.196288... (pred 0.196288...), TV(p)=0.507835... (pred 0.507835...), bound 1-1/|M|=1/2 STRICT   OK
+  defect formulas: confirmed

@@ -2,22 +2,24 @@
 # -*- coding: utf-8 -*-
 """
 Companion script to:
-  F. Vaccarino, "Statistical models as natural transformations: a bridge
-  from the McCullagh--Brons hexagon to Markov categories" (2026), Section 6.
+  F. Vaccarino, "Statistical models as natural transformations:
+  meaningfulness, coherence and priors as states in Markov categories"
+  (2026), Section 6.
 One-way layout: defect cochain, Baues--Wirsching complex, obstruction classes.
 
-Reproduces the computations reported in Examples 6.6--6.8 of the paper:
-  RUN 1   Example 6.6 / 6.7(i): arrow category; the family is natural,
+Reproduces the computations reported in Examples 6.7, 6.10 and 6.12 of the
+paper (the run labels are those used in Section 6.2):
+  RUN 1   Example 6.10(i): arrow category; the family is natural,
           dim C^1 = dim Z^1 = dim B^1 = 16, H^1 = 0.
-  RUN 2   Example 6.7(ii): full category, S = {1,2}; defect supported on
+  RUN 2   Example 6.10(ii): full category, S = {1,2}; defect supported on
           {i1, i2, c1, c2}, cocycle identity of Lemma 6.3 verified on all
           22 composable pairs, unrestricted correction recovers the
           within-group dispersion.
-  RUN 3   Example 6.7(iii): recalibration class under scale confounding
+  RUN 3   Example 6.10(iii): recalibration class under scale confounding
           (S = {1, 5/4}); obstruction nonzero relative to the class.
-  CHECK A robustness: arrow category, quantity with nonzero defect on p.
-  CHECK B Example 6.8: M = {0,1,2}; H^1 of the full design category is
-          nonzero at three levels of the treatment mean.
+  CHECK A Example 6.10(i): arrow category, quantity with nonzero defect on p.
+  CHECK B Examples 6.10(iii) and 6.12: M = {0,1,2}; H^1 of the full design
+          category is nonzero at three levels of the treatment mean.
 
 Exact linear algebra over QQ (sympy.Rational). Requires python3 with sympy
 and numpy; runs unchanged under `sage -python`.
@@ -25,7 +27,7 @@ and numpy; runs unchanged under `sage -python`.
 Setup (Definition 6.1, Lemma 6.3, Proposition 6.4 of the paper):
   O  : covariate category. Two variants:
        - "arrow": objects w1={*}, w2={1,2}; single non-identity morphism
-         p : w2 -> w1 (merge groups).  [Example 6.6 of the paper as written]
+         p : w2 -> w1 (merge groups).  [O_arr of Example 6.7]
        - "full" : full subcategory of FinSet on {*} and {1,2}: adds the two
          injections i1,i2 : w1 -> w2 (subgroup selection), the swap
          s : w2 -> w2 (treatment relabelling), and the constants
@@ -252,7 +254,7 @@ def fast_rank(Msym):
 
 def run(variant, M, S, g1fun, g2fun, label):
     print('=' * 78)
-    print(f'RUN: {label}')
+    print(label)
     print(f'  category = {variant},  M = {M},  S = {S}')
     mor = make_category(variant)
     Th1, Th2 = theta_elems(1, M, S), theta_elems(2, M, S)
@@ -391,19 +393,19 @@ if __name__ == '__main__':
 
     M0 = [0, 1]
 
-    # RUN 1 -- Example 6.6 of the paper exactly as written: arrow category.
+    # RUN 1 -- arrow category O_arr of Example 6.7.
     r1_ = run('arrow', M0, [R(1), R(2)], g1, g2,
-              'Example 6.6 (arrow category, merge morphism only)')
+              'RUN 1: arrow category, merge morphism only, S={1,2}')
 
     # RUN 2 -- full FinSet subcategory, separated dispersion scales.
     r2_ = run('full', M0, [R(1), R(2)], g1, g2,
-              'full design category, separated scales S={1,2}')
+              'RUN 2: full design category, separated scales S={1,2}')
     recalibration_scan(r2_, g1, g2)
 
     # RUN 3 -- full category, OVERLAPPING scales: S = {1, 5/4}; the marginal
     # value 5/4 conflates (within=1, overdispersed) with (within=5/4, none).
     r3_ = run('full', M0, [R(1), R(5, 4)], g1, g2,
-              'full design category, overlapping scales S={1, 5/4} (scale confounding)')
+              'RUN 3: full design category, overlapping scales S={1, 5/4} (scale confounding)')
     recalibration_scan(r3_, g1, g2)
 
 

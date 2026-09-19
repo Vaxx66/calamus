@@ -1,5 +1,5 @@
 ==============================================================================
-RUN: Example 6.6 (arrow category, merge morphism only)
+RUN 1: arrow category, merge morphism only, S={1,2}
   category = arrow,  M = [0, 1],  S = [1, 2]
   |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 2, 9/4]
   defect cochain c: nonzero exactly on -- (natural!)
@@ -7,7 +7,7 @@ RUN: Example 6.6 (arrow category, merge morphism only)
   dim C^1 = 16, dim Z^1 = 16, dim B^1 = 16, dim H^1(BW; Hom(B,A)) = 0
   [c] = 0 in unrestricted H^1?  True
 ==============================================================================
-RUN: full design category, separated scales S={1,2}
+RUN 2: full design category, separated scales S={1,2}
   category = full,  M = [0, 1],  S = [1, 2]
   |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 2, 9/4]
   defect cochain c: nonzero exactly on ['c1', 'c2', 'i1', 'i2']
@@ -29,7 +29,7 @@ RUN: full design category, separated scales S={1,2}
     information-bearing (non-constant) recalibration exists: True
     bijective recalibration exists: False
 ==============================================================================
-RUN: full design category, overlapping scales S={1, 5/4} (scale confounding)
+RUN 3: full design category, overlapping scales S={1, 5/4} (scale confounding)
   category = full,  M = [0, 1],  S = [1, 5/4]
   |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 3/2]
   defect cochain c: nonzero exactly on ['c1', 'c2', 'i1', 'i2']
@@ -54,7 +54,7 @@ RUN: full design category, overlapping scales S={1, 5/4} (scale confounding)
         every natural recalibration of the marginal dispersion is
         constant, i.e. destroys all information (scale confounding).
 ==============================================================================
-RUN: CHECK A: arrow category, quantity with nonzero defect on p
+CHECK A: arrow category, quantity with nonzero defect on p
   category = arrow,  M = [0, 1],  S = [1, 2]
   |Theta(w1)| = 4, |Theta(w2)| = 8, T = [1, 5/4, 2, 9/4]
   defect cochain c: nonzero exactly on ['p']
@@ -72,7 +72,7 @@ RUN: CHECK A: arrow category, quantity with nonzero defect on p
       ((1, 1), 1) -> 5/4
       ((1, 1), 2) -> 9/4
 ==============================================================================
-RUN: CHECK B: full category, M={0,1,2}, S={1,2}
+CHECK B: full category, M={0,1,2}, S={1,2}
   category = full,  M = [0, 1, 2],  S = [1, 2]
   |Theta(w1)| = 6, |Theta(w2)| = 18, T = [1, 5/4, 2, 9/4, 3]
   defect cochain c: nonzero exactly on ['c1', 'c2', 'i1', 'i2']

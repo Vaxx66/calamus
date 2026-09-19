@@ -8,14 +8,14 @@ authors:
     affiliation: "Dipartimento di Scienze Matematiche 'G. L. Lagrange', Politecnico di Torino"
 repository-code: "https://github.com/Vaxx66/calamus"
 license: MIT
-date-released: 2026-09-10
-version: "v33k"
+date-released: 2026-09-19
+version: "v34"
 preferred-citation:
   type: article
   authors:
     - family-names: Vaccarino
       given-names: Francesco
-  title: "Statistical models as natural transformations: a bridge from the McCullagh–Brøns hexagon to Markov categories"
+  title: "Statistical models as natural transformations: meaningfulness, coherence and priors as states in Markov categories"
   year: 2026
   # identifiers:
   #   - type: other

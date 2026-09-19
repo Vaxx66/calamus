@@ -1,6 +1,6 @@
 """Exact (over Q) Baues-Wirsching H^1 of the two-object design scheme O_full / O_arr
-of F. Vaccarino, "Statistical models as natural transformations: a bridge from the
-McCullagh--Brons hexagon to Markov categories" (2026), Examples 6.6 and 6.8, with Lambda constant
+of F. Vaccarino, "Statistical models as natural transformations: meaningfulness,
+coherence and priors as states in Markov categories" (2026), Examples 6.7 and 6.12, with Lambda constant
 at T = image of g and B(psi) = id.  Because B(psi)=id and B(omega)=k^T, the complex with
 coefficients Hom(B(dom),A(cod)) is the |T|-fold direct sum of the complex with
 coefficients psi |-> A(cod psi); we compute the latter and multiply by |T|."""
