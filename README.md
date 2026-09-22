@@ -96,11 +96,11 @@ MIT for the code in this repository (see `LICENSE`). The manuscript in `manuscri
   author        = {Vaccarino, Francesco},
   title         = {Statistical models as natural transformations: meaningfulness, coherence and priors as states in {Markov} categories},
   year          = {2026},
-  eprint        = {XXXX.XXXXX},
+  eprint        = {2609.22929},
   archivePrefix = {arXiv},
   primaryClass  = {math.ST},
   note          = {Computational supplement: \url{https://github.com/Vaxx66/calamus}, release v34}
 }
 ```
 
-Replace `XXXX.XXXXX` with the arXiv identifier once announced; see also `CITATION.cff`.
+See also `CITATION.cff`.
