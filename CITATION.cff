@@ -17,6 +17,6 @@ preferred-citation:
       given-names: Francesco
   title: "Statistical models as natural transformations: meaningfulness, coherence and priors as states in Markov categories"
   year: 2026
-  # identifiers:
-  #   - type: other
-  #     value: "arXiv:XXXX.XXXXX"
+  identifiers:
+  - type: other
+  value: "arXiv:2609.22929"
