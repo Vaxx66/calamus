@@ -8,8 +8,8 @@ authors:
     affiliation: "Dipartimento di Scienze Matematiche 'G. L. Lagrange', Politecnico di Torino"
 repository-code: "https://github.com/Vaxx66/calamus"
 license: MIT
-date-released: 2026-09-19
-version: "v34"
+date-released: 2026-09-22
+version: "v35"
 preferred-citation:
   type: article
   authors:
@@ -17,6 +17,8 @@ preferred-citation:
       given-names: Francesco
   title: "Statistical models as natural transformations: meaningfulness, coherence and priors as states in Markov categories"
   year: 2026
+  url: "https://arxiv.org/abs/2609.22929"
   identifiers:
-  - type: other
-  value: "arXiv:2609.22929"
+    - type: other
+      value: "arXiv:2609.22929"
+  notes: "Computational supplement: https://github.com/Vaxx66/calamus, release v35"
