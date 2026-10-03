@@ -8,8 +8,8 @@ authors:
     affiliation: "Dipartimento di Scienze Matematiche 'G. L. Lagrange', Politecnico di Torino"
 repository-code: "https://github.com/Vaxx66/calamus"
 license: MIT
-date-released: 2026-09-22
-version: "v35"
+date-released: 2026-10-03
+version: "v36"
 preferred-citation:
   type: article
   authors:
@@ -21,4 +21,4 @@ preferred-citation:
   identifiers:
     - type: other
       value: "arXiv:2609.22929"
-  notes: "Computational supplement: https://github.com/Vaxx66/calamus, release v35"
+  notes: "Computational supplement: https://github.com/Vaxx66/calamus, release v36"

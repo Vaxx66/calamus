@@ -4,7 +4,7 @@ Computational supplement and manuscript for:
 
 > F. Vaccarino, *Statistical models as natural transformations: meaningfulness, coherence and priors as states in Markov categories*, 2026. arXiv:[2609.22929](https://arxiv.org/abs/2609.22929) (math.ST; cross-listed math.CT, math.PR).
 
-**Status (release `v35`, September 2026).** The manuscript (39 pages) is deposited in `manuscript/`; it is the second version (v2) of arXiv:2609.22929, whose first version was submitted on 19 September 2026. The changes with respect to v1 are listed in `manuscript/CHANGES.md`; they concern Sections 7–9 only, and every number quoted in the manuscript is read from the outputs committed here, which are unchanged since release `v34`. This release is the one cited in the manuscript. The repository is the stable reference for the computational supplement of the CALAMUS research programme (*Categorical Languages for Models and Uncertainty in Statistics*).
+**Status (release `v36`, October 2026).** The manuscript (39 pages) is deposited in `manuscript/`; it is the third version (v3) of arXiv:2609.22929, whose first version was submitted on 19 September 2026. The changes with respect to v2 and to v1 are listed in `manuscript/CHANGES.md`; v3 corrects the attribution of the Markov category of diagrams to Fritz (2020, Section 7) in Section 1 and Remarks 4.6 and 8.6, with numbering and bibliography unchanged. Every number quoted in the manuscript is read from the outputs committed here, which are unchanged since release `v34`. This release is the one cited in the manuscript. The repository is the stable reference for the computational supplement of the CALAMUS research programme (*Categorical Languages for Models and Uncertainty in Statistics*).
 
 ## Abstract
 
@@ -14,10 +14,10 @@ We show that a statistical model in the sense of McCullagh, in the form given by
 
 ### Manuscript (`manuscript/`)
 
-- `calamus_arkiv_draft_light_v03.pdf` — the manuscript (39 pages, arXiv v2).
-- `calamus_arkiv_draft_light_v03.tex`, `calamus_arkiv_draft_light_v03.bbl` — the source pair, identical to the one posted on arXiv as v2; it builds with `pdflatex` alone (three passes, no BibTeX).
-- `calamus_arkiv_draft_light_v03.bib` — the bibliography, exactly the 28 entries cited. The full chain `pdflatex → bibtex → pdflatex ×2` reproduces the committed `.bbl` byte for byte.
-- `CHANGES.md` — the changes from v1 to v2.
+- `calamus_arkiv_draft_light_v04.pdf` — the manuscript (39 pages, arXiv v3).
+- `calamus_arkiv_draft_light_v04.tex`, `calamus_arkiv_draft_light_v04.bbl` — the source pair, identical to the one posted on arXiv as v3; it builds with `pdflatex` alone (three passes, no BibTeX).
+- `calamus_arkiv_draft_light_v04.bib` — the bibliography, exactly the 28 entries cited. The full chain `pdflatex → bibtex → pdflatex ×2` reproduces the committed `.bbl` byte for byte.
+- `CHANGES.md` — the changes from v2 to v3 and from v1 to v2.
 
 ### Code for Section 6 (cohomological obstruction, one-way layout)
 
@@ -79,6 +79,11 @@ python3 oneway_prior_coherence.py  > oneway_prior_coherence_output.txt
 
 The three scripts are self-contained and deterministic, and a fresh run reproduces the committed outputs byte for byte. Last reproduction check: 22 September 2026, with Python 3.12.3, sympy 1.14.0 and numpy 2.4.4.
 
+## Changes in release `v36` with respect to `v35`
+
+- Manuscript v3 (source `calamus_arkiv_draft_light_v04`): attribution of the Markov category of diagrams Fun(D, C) and of the question of its conditionals to Fritz (2020, Proposition 7.1 and Problem 11.9), in Section 1 and in Remarks 4.6 and 8.6; release tag in the footnote of Section 6.2; date. Listed in `manuscript/CHANGES.md`. Numbering, bibliography and page count are unchanged.
+- The scripts and their committed outputs are unchanged.
+
 ## Changes in release `v35` with respect to `v34`
 
 - Manuscript v2 (source `calamus_arkiv_draft_light_v03`): thirteen corrections in Sections 7–9 and in the footnote of Section 6.2, listed in `manuscript/CHANGES.md`. Numbering and bibliography are unchanged.
@@ -105,7 +110,7 @@ MIT for the code in this repository (see `LICENSE`). The manuscript in `manuscri
   eprint        = {2609.22929},
   archivePrefix = {arXiv},
   primaryClass  = {math.ST},
-  note          = {Computational supplement: \url{https://github.com/Vaxx66/calamus}, release v35}
+  note          = {Computational supplement: \url{https://github.com/Vaxx66/calamus}, release v36}
 }
 ```
 
