@@ -1,5 +1,13 @@
 # Changes to the manuscript
 
+## In preparation (source `calamus_arkiv_draft_light_v05`, not released) with respect to v3 (source `calamus_arkiv_draft_light_v04`, release `v36`)
+
+Two attributions. No numbered statement is added or removed; the numbering of theorems, propositions, definitions and equations is unchanged, the bibliography is unchanged (the `.bbl` file is identical), and the manuscript is still 39 pages.
+
+1. **Section 1, related work.** A sentence is added after the reading of Theorem 1.1 as a morphism of Fun(V × D^op, Stoch): that the models of McCullagh should fit into a category of this kind is suggested by Fritz (footnote 29, at Definition 14.1), who leaves the details open. In that footnote Fritz finds it plausible that the refined definitions of McCullagh and of Lauritzen fit his formalism through suitable categories of diagrams, those of his Section 7, and says that he has not worked out the details.
+2. **Remark 9.5.** "The first one is the instruction to apply ridge regression to standardised covariates, which is already present in the original paper" reads "The first one is that ridge regression is applied to standardised covariates, as in the original paper". Hoerl and Kennard give no instruction: on p. 56 they fix as a convention that the model is formulated to give X′X in correlation form, and they do not say that it must be so. The rest of the sentence and the pointer to pp. 55–56 are unchanged.
+3. **Left for the release.** The footnote of Section 6.2 still names the release `v36` and the date is still October 2026. Both are set when this source is released.
+
 ## v3 (source `calamus_arkiv_draft_light_v04`, release `v36`) with respect to v2 (source `calamus_arkiv_draft_light_v03`, release `v35`)
 
 Attribution of the diagram Markov category to Fritz. No numbered statement is added or removed; the numbering of theorems, propositions, definitions and equations is unchanged, the bibliography is unchanged (the `.bbl` file is identical), and the manuscript is still 39 pages.
